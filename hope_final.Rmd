@@ -258,30 +258,55 @@ drought_severity$county <- gsub(" County", "", drought_severity$county)
 drought_severity$county <- sapply(drought_severity$county, tolower)
 
 names(drought_severity)[names(drought_severity) == "county"] <- "subregion"
+drought_severity <- data.frame(drought_severity)
+
+#adding month and year column for later
+drought_severity$releaseDate <- as.Date(drought_severity$releaseDate)
+drought_severity$month <- months(drought_severity$releaseDate)
+drought_severity$year <- format(drought_severity$releaseDate, format="%y")
 
 
 #coordinates for the california counties
 CAcounties <- map_data('county')%>%
   filter(region == "california")
+CAcounties <- data.frame(CAcounties)
 
-#joining two previous data sets so it's all in one
+
+#merge drought information with coordinates for each county
+
 drought_coord <- drought_severity%>%
-  inner_join(CAcounties, by = "subregion" )
+  inner_join(CAcounties, by = "subregion")
+
+tidy_drought_coord <- drought_coord%>%
+  gather(key = category, vaue = value, NONE, D0, D1, D2, D3, D4)
+```
 
 
-#would rather use this over drought_severity but trying to figure out what kind of variables are necessary in the dataset and the map data for geom_map
 
-#new_drought <- drought_coord%>%
-#+ group_by(year(releaseDate), long, lat, order, group, subregion)%>%
-#+ summarise(avepercent = mean(percentCurrent))
+```{r}
+#gonna try to plot different months/years
+#all aprils over each year (2000 and 2010-2015)
+tidy_coord_aprils <- tidy_drought_coord%>%
+  filter(year == "00" | year == "10" | year == "11" | year == "12" | year == "13" | year == "14" | year == "15")%>%
+  group_by(month, year, subregion, category, long, lat, group, order)%>%
+  summarise(ave = mean(value))%>%
+  filter(month == "April")
 
-#names(new_drought)[names(new_drought) == "year(releaseDate)"] <- "year"
-
+tidy_coord_aprils <- data.frame(tidy_coord_aprils)
 
 
 #trying to plot here, testing different data and map info needed
 
-#drought_severity%>%
-#  ggplot(aes(map_id = factor(subregion))) + geom_map(aes(fill = factor(D4_ave)), map = CAcounties) + expand_limits(x = CAcounties$long, y = CAcounties$lat)
+basemap <- ggplot(CAcounties, aes(x = long, y = lat, group = group)) 
+
+basemap +
+  coord_equal() + 
+  geom_polygon(data = (tidy_coord_aprils), aes(fill = as.factor(ave))) +
+  scale_fill_gradient(low = "yellow", high = "red")+ 
+  facet_grid(tidy_coord_aprils$year ~ tidy_coord_aprils$category) + 
+  labs ( x = "Drought Severity Index", y = "Year") + 
+  theme(axis.line=element_blank(),axis.text.x=element_blank(),
+          axis.text.y=element_blank(),axis.ticks=element_blank(), legend.position="none")
+
 ```
 
