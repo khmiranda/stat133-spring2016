@@ -282,8 +282,6 @@ drought_coord <- drought_severity%>%
 #trying to plot here, testing different data and map info needed
 
 #drought_severity%>%
-#  ggplot() + 
-#  geom_map(aes(x = long, y = lat, group = group, map_id = 'subregion', fill = avepercent), map = CAcounties) + 
-#  facet_wrap(~year)
+#  ggplot(aes(map_id = factor(subregion))) + geom_map(aes(fill = factor(D4_ave)), map = CAcounties) + expand_limits(x = CAcounties$long, y = CAcounties$lat)
 ```
 
