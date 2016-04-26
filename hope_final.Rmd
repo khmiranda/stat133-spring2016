@@ -1,0 +1,293 @@
+---
+title: "HTMN"
+author: "Hope Miranda"
+date: ""
+output: 
+  html_document:
+    fig_height: 5
+    fig_width: 12
+---
+<!-- Don't edit in between this line and the one below -->
+```{r include=FALSE}
+# Don't delete this chunk if you are using the DataComputing package
+library(DataComputing)
+library(car)
+library(lubridate)
+```
+*Source file* 
+```{r, results='asis', echo=FALSE}
+includeSourceDocuments()
+```
+<!-- Don't edit the material above this line -->
+
+
+```{r}
+water_residential <- "/Users/Hope/Desktop/stats133/uw_supplier_data040416.csv"
+new_water_residential <- water_residential  %>%
+  read.file() %>%
+  select(Supplier.Name, Stage.Invoked, Mandatory.Restrictions, 
+         Reporting.Month, CALCULATED.R.GPCD.Reporting.Month..Values.calculated.by.Water.Board.staff.using.methodology.available.at.http...www.waterboards.ca.gov.waterrights.water_issues.programs.drought.docs.ws_tools.guidance_estimate_res_gpcd.pdf., Hydrologic.Region, Penalties.Assessed, X..Residential.Use)
+```
+
+
+```{r}
+names(new_water_residential)[names(new_water_residential) == 'CALCULATED.R.GPCD.Reporting.Month..Values.calculated.by.Water.Board.staff.using.methodology.available.at.http...www.waterboards.ca.gov.waterrights.water_issues.programs.drought.docs.ws_tools.guidance_estimate_res_gpcd.pdf.'] <- 'resid_use'
+```
+
+```{r}
+new_water_residential$Reporting.Month <- new_water_residential$Reporting.Month%>%
+  mdy()
+```
+
+
+#Case Study: Bay Area Counties vs Los Angeles County, who is doing their part? 
+
+```{r}
+#los angeles water suppliers
+#want all of los angeles county so any water supplier that matches the cities within LA county
+#some gsub to get this nice list of the cities in LA county
+
+lacities <- "Agoura Hills Alhambra Arcadia Artesia Avalon Azusa Baldwin Park Bell Bell Gardens Bellflower Beverly Hills Bradbury Burbank Calabasas Carson Cerritos Claremont Commerce Compton Covina Cudahy Culver City Diamond Bar Downey Duarte El Monte El Segundo Gardena Glendale Glendora Hawaiian Gardens Hawthorne Hermosa Beach Hidden Hills Huntington Park Industry Inglewood Irwindale La Cañada Flintridge La Habra Heights La Mirada La Puente La Verne Lakewood Lancaster Lawndale Lomita Long Beach Los Angeles Lynwood Malibu Manhattan Beach Maywood Monrovia Montebello Monterey Park Norwalk Palmdale Palos Verdes Estates Paramount Pasadena Pico Rivera Pomona Rancho Palos Verdes Redondo Beach Rolling Hills Rolling Hills Estates Rosemead San Dimas San Fernando San Gabriel San Marino Santa Clarita Santa Fe Springs Santa Monica Sierra Madre Signal Hill South El Monte South Gate South Pasadena Temple City Torrance Vernon Walnut West Covina West Hollywood Westlake Village Whittier"
+lacities <- gsub(" " , ")|(" , lacities)
+
+lacities
+
+#NOT SHOWN:then manually put a . in between cities with more than one word in the name to account for spaces
+#below is the dataset that only has los angeles county levels of water usage
+
+losangeles.avg <- new_water_residential%>%
+  filter(grepl("(Agoura.Hills)|(Alhambra)|(Arcadia)|(Artesia)|(Avalon)|(Azusa)|(Baldwin.Park)|(Bell)|(Bell.Gardens)|(Bellflower)|(Beverly.Hills)|(Bradbury)|(Burbank)|(Calabasas)|(Carson)|(Cerritos)|(Claremont)|(Commerce)|(Compton)|(Covina)|(Cudahy)|(Culver.City)|(Diamond.Bar)|(Downey)|(Duarte)|(El.Monte)|(El.Segundo)|(Gardena)|(Glendale)|(Glendora)|(Hawaiian)|(Gardens)|(Hawthorne)|(Hermosa.Beach)|(Hidden.Hills)|(Huntington.Park)|(Industry)|(Inglewood)|(Irwindale)|(La.Cañada.Flintridge)|(La.Habra.Heights)|(La.Mirada)|(La.Puente)|(La.Verne)|(Lakewood)|(Lancaster)|(Lawndale)|(Lomita)|(Long.Beach)|(Los.Angeles)|(Lynwood)|(Malibu)|(Manhattan.Beach)|(Maywood)|(Monrovia)|(Montebello)|(Monterey.Park)|(Norwalk)|(Palmdale)|(Palos.Verdes.Estates)|(Paramount)|(Pasadena)|(Pico.Rivera)|(Pomona)|(Rancho)|(Palos.Verdes)|(Redondo.Beach)|(Rolling.Hills)|(Rolling.Hills.Estates)|(Rosemead)|(San.Dimas)|(San.Fernando)|(San.Gabriel)|(San.Marino)|(Santa.Clarita)|(Santa.Fe.Springs)|(Santa.Monica)|(Sierra.Madre)|(Signal.Hill)|(South.El.Monte)|(South.Gate)|(South.Pasadena)|(Temple.City)|(Torrance)|(Vernon)|(Walnut)|(West.Covina)|(West.Hollywood)|(Westlake)|(Village)|(Whittier)", Supplier.Name))%>%
+  group_by(Reporting.Month)%>%
+  summarise(la_use_avg = mean(resid_use))
+```
+
+
+```{r}
+#there are multiple counties surrounding the bay: SF, Marin, Sonoma, Napa, Solano, Contra Costa, Alameda, Santa Clara, and San Mateo. Eastbay
+
+sfbay <- "Alameda, California
++ Albany, California
++ American Canyon, California
++ Antioch, California
++ Atherton, California
++ B
++ Belmont, California
++ Belvedere, California
++ Benicia, California
++ Berkeley, California
++ Brentwood, California
++ Brisbane, California
++ Burlingame, California
++ C
++ Calistoga, California
++ Campbell, California
++ Clayton, California
++ Cloverdale, California
++ Colma, California
++ Concord, California
++ Corte Madera, California
++ Cotati, California
++ Cupertino, California
++ D
++ Daly City, California
++ Danville, California
++ Dixon, California
++ Dublin, California
++ E
++ East Palo Alto, California
++ El Cerrito, California
++ Emeryville, California
++ F
++ Fairfax, California
++ Foster City, California
++ Fremont, California
++ G
++ Gilroy, California
++ H
++ Half Moon Bay, California
++ Hayward, California
++ Healdsburg, California
++ Hercules, California
++ Hillsborough, California
++ L
++ Lafayette, California
++ Larkspur, California
++ Livermore, California
++ Los Altos, California
++ Los Altos Hills, California
++ Los Gatos, California
++ M
++ Martinez, California
++ Menlo Park, California
++ Mill Valley, California
++ Millbrae, California
++ Milpitas, California
++ Monte Sereno, California
++ Moraga, California
++ Morgan Hill, California
++ Mountain View, California
++ N
++ Napa, California
++ Newark, California
++ Novato, California
++ O
++ Oakland, California
++ Oakley, California
++ Orinda, California
++ P
++ Pacifica, California
++ Palo Alto, California
++ Petaluma, California
++ Piedmont, California
++ Pinole, California
++ Pittsburg, California
++ Pleasant Hill, California
++ Pleasanton, California
++ Portola Valley, California
++ R
++ Redwood City, California
++ Richmond, California
++ Rio Vista, California
++ Rohnert Park, California
++ Ross, California
++ S
++ St. Helena, California
++ San Anselmo, California
++ San Carlos, California
++ San Francisco
++ San Jose, California
++ San Leandro, California
++ San Mateo, California
++ San Pablo, California
++ San Rafael, California
++ San Ramon, California
++ Santa Clara, California
++ Santa Rosa, California
++ Saratoga, California
++ Sausalito, California
++ Sebastopol, California
++ Sonoma, California
++ South San Francisco, California
++ Suisun City, California
++ Sunnyvale, California
++ T
++ Tiburon, California
++ U
++ Union City, California
++ V
++ Vacaville, California
++ Vallejo, California
++ W
++ Walnut Creek, California
++ Windsor, California
++ Woodside, California
++ Y
++ Yountville, California"
+
+sfbay <- gsub("California", "", sfbay) #get rid of california
+sfbay <- gsub("\n[A-Z]\n", "", sfbay) #get rid of the headers for each section of cities beginning with a certain letter
+sfbay <- gsub("\n", "", sfbay) #getting rid of extra newlines
+sfbay <- gsub(", " , ")|(", sfbay) #inputting the separations for when I use grepl later
+
+sfbay  #want to look at it so I can copy/paste and make small edits for when I use it in grepl
+
+
+bayavg <-  new_water_residential%>%
+  filter(grepl( "(Alameda)|(Albany)|(American.Canyon)|(Antioch)|(Atherton)|(Belmont)|(Belvedere)|(Benicia)|(Berkeley)|(Brentwood)|(Brisbane)|(Burlingame)|(Calistoga)|(Campbell)|(Clayton)|(Cloverdale)|(Colma)|(Concord)|(Corte.Madera)|(Cotati)|(Cupertino)|(Daly.City)|(Danville)|(Dixon)|(Dublin)|(East.Palo.Alto)|(El.Cerrito)|(Emeryville)|(Fairfax)|(Foster.City)|(Fremont)|(Gilroy)|(Half.Moon.Bay)|(Hayward)|(Healdsburg)|(Hercules)|(Hillsborough)|(Lafayette)|(Larkspur)|(Livermore)|(Los.Altos)|(Los.Altos.Hills)|(Los.Gatos)|(Martinez)|(Menlo.Park)|(Mill.Valley)|(Millbrae)|(Milpitas)|(Monte.Sereno)|(Moraga)|(Morgan.Hill)|(Mountain.View)|(Napa)|(Newark)|(Novato)|(Oakland)|(Oakley)|(Orinda)|(Pacifica)|(Palo.Alto)|(Petaluma)|(Piedmont)|(Pinole)|(Pittsburg)|(Pleasant.Hill)|(Pleasanton)|(Portola.Valley)|(Redwood.City)|(Richmond)|(Rio.Vista)|(Rohnert.Park)|(Ross)|(St..Helena)|(San.Anselmo)|(San.Carlos)|(San.FranciscoSan.Jose)|(San.Leandro)|(San.Mateo)|(San.Pablo)|(San.Rafael)|(San.Ramon)|(Santa.Clara)|(Santa.Rosa)|(Saratoga)|(Sausalito)|(Sebastopol)|(Sonoma)|(South.San.Francisco)|(Suisun.City)|(Sunnyvale)|(Tiburon)|(Union.City)|(Vacaville)|(Vallejo)|(Walnut.Creek)|(Windsor)|(Woodside)|(Yountville)|(East.Bay)", Supplier.Name ))%>%
+  group_by(Reporting.Month)%>%
+  summarise(bay_use_avg = mean(resid_use))
+
+```
+
+```{r}
+# we want to compare to california as a whole so let's take the average for every month for the whole state!
+
+state.avg <- new_water_residential%>%
+  group_by(Reporting.Month)%>%
+  summarise(state_use_avg = mean(resid_use))
+```
+
+Now let's combine all three of these datasets so that we have just one dataset we're plotting from
+
+```{r}
+la_state <- state.avg%>%
+  inner_join(losangeles.avg, by = c("Reporting.Month" = "Reporting.Month"))
+
+alljoined <- la_state%>%
+  inner_join(bayavg, by = c("Reporting.Month" = "Reporting.Month"))
+
+#now that I have everything joined, I have to make it tidy
+#using gather to make it narrow
+
+narrowall <- alljoined%>%
+  gather(key = boundary, value = avg_resid_use, state_use_avg, la_use_avg, bay_use_avg)
+
+```
+
+Time to plot!
+
+```{r}
+  ggplot(narrowall, aes(x=Reporting.Month, y= avg_resid_use, color = boundary)) +
+  geom_point() + 
+  stat_smooth(se=FALSE, method="loess") +
+  labs(x = "Month", y = "Average Residential Water Usage", title = "Water Usage vs Month: in LA County and all 9 Bay Area Counties") +
+  theme_minimal() + 
+  theme(plot.title = element_text(size = 25),
+        axis.title.x = element_text(size = 18),
+        axis.title.y = element_text(size = 18) 
+        )
+```
+
+##Analysis of Case Study
+
+initial analysis: install
+
+#drought severity in California over time
+
+```{r}
+
+library(mapdata)
+library(ggmap)
+
+#data set that has drought by county
+
+drought_severity <- "/Users/Hope/Desktop/stats133/countydroughtseverity.csv"
+drought_severity <- drought_severity%>%
+  read.file()
+drought_severity$county <- gsub(" County", "", drought_severity$county)
+drought_severity$county <- sapply(drought_severity$county, tolower)
+
+names(drought_severity)[names(drought_severity) == "county"] <- "subregion"
+
+#to deal with a smaller dataset, taking the average percent for each county each year
+#new_drought_percent <- drought_percent%>%
+#  group_by(year(releaseDate), subregion)%>%
+#  summarise(avepercent = mean(percentCurrent))
+
+#names(drought_percent)[names(drought_percent) == "year(releaseDate)"] <- "year"
+
+#coordinates for the california counties
+CAcounties <- map_data('county')%>%
+  filter(region == "california")
+
+#joining two previous data sets so it's all in one
+drought_coord <- drought_severity%>%
+  inner_join(CAcounties, by = "subregion" )
+
+#would rather use this over new_drought_percent, but trying to figure out what kind of variables are necessary in the dataset and the map data for geom_map
+
+#new_drought <- drought_coord%>%
+#+ group_by(year(releaseDate), long, lat, order, group, subregion)%>%
+#+ summarise(avepercent = mean(percentCurrent))
+
+#names(new_drought)[names(new_drought) == "year(releaseDate)"] <- "year"
+
+
+#trying to plot here, testing different data and map info needed
+
+#new_drought%>%
+#  ggplot() + 
+#  geom_map(aes(x = long, y = lat, group = group, map_id = 'subregion', fill = avepercent), map = CAcounties) + 
+#  facet_wrap(~year)
+```
+
