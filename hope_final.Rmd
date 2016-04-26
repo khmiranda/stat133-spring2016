@@ -259,12 +259,6 @@ drought_severity$county <- sapply(drought_severity$county, tolower)
 
 names(drought_severity)[names(drought_severity) == "county"] <- "subregion"
 
-#to deal with a smaller dataset, taking the average percent for each county each year
-#new_drought_percent <- drought_percent%>%
-#  group_by(year(releaseDate), subregion)%>%
-#  summarise(avepercent = mean(percentCurrent))
-
-#names(drought_percent)[names(drought_percent) == "year(releaseDate)"] <- "year"
 
 #coordinates for the california counties
 CAcounties <- map_data('county')%>%
@@ -274,7 +268,8 @@ CAcounties <- map_data('county')%>%
 drought_coord <- drought_severity%>%
   inner_join(CAcounties, by = "subregion" )
 
-#would rather use this over new_drought_percent, but trying to figure out what kind of variables are necessary in the dataset and the map data for geom_map
+
+#would rather use this over drought_severity but trying to figure out what kind of variables are necessary in the dataset and the map data for geom_map
 
 #new_drought <- drought_coord%>%
 #+ group_by(year(releaseDate), long, lat, order, group, subregion)%>%
@@ -283,9 +278,10 @@ drought_coord <- drought_severity%>%
 #names(new_drought)[names(new_drought) == "year(releaseDate)"] <- "year"
 
 
+
 #trying to plot here, testing different data and map info needed
 
-#new_drought%>%
+#drought_severity%>%
 #  ggplot() + 
 #  geom_map(aes(x = long, y = lat, group = group, map_id = 'subregion', fill = avepercent), map = CAcounties) + 
 #  facet_wrap(~year)
