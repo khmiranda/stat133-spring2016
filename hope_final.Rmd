@@ -280,6 +280,7 @@ drought_severity$year <- format(drought_severity$releaseDate, format="%y")
 tidy_severity <- drought_severity%>%
   gather(key = category, value = value, NONE, D0, D1, D2, D3, D4)%>%
   filter(year == "00" | year == "05" | year == "10" | year == "11" | year == "12" | year == "13" | year == "14" | year == "15" | year =="16")%>%
+  filter(month == "February" | month == "May" | month == "August" | month == "November")%>%
   select(subregion, month, year, category, value)%>%
     group_by(month, year, subregion, category)%>%
   summarise(ave_value = mean(value))
@@ -295,9 +296,16 @@ CAcounties <- data.frame(CAcounties)
 
 
 #merge drought information with coordinates for each county
-
 CAcountiesvalues <- CAcounties%>%
   right_join(tidy_severity, by = "subregion")
+
+
+#creating levels for mapping later
+CAcountiesvalues$category <- factor(CAcountiesvalues$category, levels = c("D4", "D3", "D2", "D1", "D0", "NONE"))
+
+CAcountiesvalues$month <- factor(CAcountiesvalues$month, levels = c("February", "May", "August", "November"))
+
+
 
 ```
 
@@ -309,12 +317,17 @@ CAcountiesvalues <- CAcounties%>%
 #trying to plot here, testing different data and map info needed
 
 
-ggplot() +
-  geom_polygon(data = CAcountiesvalues, aes(x = long, y = lat, group = group, fill = ave_value), color = "black", size = 0.25) + scale_fill_gradient(low = "blue", high = "red") + 
-  facet_grid(category ~ year) + 
-  labs ( x = "Drought Severity Index", y = "Year") +
-  theme(axis.line=element_blank(),axis.text.x=element_blank(),axis.text.y=element_blank(),axis.ticks=element_blank(), legend.position="none")
+#ggplot() +
+#  geom_polygon(data = CAcountiesvalues, aes(x = long, y = lat, group = group, fill = ave_value), color = "black", size = 0.25) + scale_fill_gradient(low = "blue", high = "red") + stat_density2d(data = CAcountiesvalues, aes(x = long, y = lat, fill = ..level.., alpha = ..level..), size = 2, bins = 5, geom = "polygon") + 
+#  facet_grid(month ~year) + 
+#  theme(axis.line=element_blank(),axis.text.x=element_blank(),axis.text.y=element_blank(),axis.ticks=element_blank(), legend.position="none")
 
 
+ggplot() +   
+  geom_polygon(data = CAcountiesvalues, aes(x = long, y = lat, group = group), color = "grey80", fill = "grey80", size = .1) + 
+  stat_density2d(data = CAcountiesvalues, aes(x = long, y = lat, color = category, fill = ..level.., alpha = ..level..), size = 1,  geom = "polygon") + scale_fill_gradient(low = "yellow", high = "red") + 
+  facet_grid(month ~ year) + 
+  labs(x = "Month", y = "year") +
+    theme(axis.line=element_blank(),axis.text.x=element_blank(),axis.text.y=element_blank(),axis.ticks=element_blank(), legend.position="none")
 ```
 
