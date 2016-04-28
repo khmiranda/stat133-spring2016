@@ -4,7 +4,7 @@ author: "Hope Miranda"
 date: ""
 output: 
   html_document:
-    fig_height: 5
+    fig_height: 8
     fig_width: 12
 ---
 <!-- Don't edit in between this line and the one below -->
@@ -242,6 +242,10 @@ Time to plot!
 
 initial analysis: install
 
+
+
+
+
 #drought severity in California over time
 
 ```{r}
@@ -263,10 +267,9 @@ drought_severity <- data.frame(drought_severity)
 #adding month and year column for later
 drought_severity$releaseDate <- as.Date(drought_severity$releaseDate)
 drought_severity$month <- months(drought_severity$releaseDate)
-drought_severity$year <- format(drought_severity$releaseDate, format="%y")
+drought_severity$year <- years(drought_severity$releaseDate)
 
 ```
-
 
 
 ```{r}
@@ -285,7 +288,9 @@ tidy_severity <- drought_severity%>%
     group_by(month, year, subregion, category)%>%
   summarise(ave_value = mean(value))
 
+#just making sure everything is in the correct format for ease of plotting
 tidy_severity <- data.frame(tidy_severity)
+tidy_severity$year <- as.numeric(tidy_severity$year)
 
 
 
@@ -305,13 +310,90 @@ CAcountiesvalues$category <- factor(CAcountiesvalues$category, levels = c("D4", 
 
 CAcountiesvalues$month <- factor(CAcountiesvalues$month, levels = c("February", "May", "August", "November"))
 
-
-
 ```
 
 
 
 ```{r}
+#smaller data sets for specific months and years
+
+#february 2000
+feb2000 <- CAcountiesvalues%>%
+  filter(month == "February", year == 0)
+#may 2000
+may2000 <- CAcountiesvalues%>%
+  filter(month == "May", year == 0)
+#august 2000
+aug2000 <- CAcountiesvalues%>%
+  filter(month == "August", year == 0)
+#november 2000
+nov2000 <- CAcountiesvalues%>%
+  filter(month == "November", year == 0)
+
+
+
+#february 2010
+feb2010 <- CAcountiesvalues%>%
+  filter(month == "February", year == 10)
+#may 2010
+may2010 <- CAcountiesvalues%>%
+  filter(month == "May", year == 10)
+#august 2010
+aug2010 <- CAcountiesvalues%>%
+  filter(month == "August", year == 10)
+#november 2010
+nov2010 <- CAcountiesvalues%>%
+  filter(month == "November", year == 10)
+
+
+#february 2014
+feb2014 <- CAcountiesvalues%>%
+  filter(month == "February", year == 14)
+#may 2014
+may2014 <- CAcountiesvalues%>%
+  filter(month == "May", year == 14)
+#august 2014
+aug2014 <- CAcountiesvalues%>%
+  filter(month == "August", year == 14)
+#november 2014
+nov2014 <- CAcountiesvalues%>%
+  filter(month == "November", year == 14)
+
+
+nov2014$category <- factor(nov2014$category, levels = c("NONE", "D0", "D1", "D2", "D3", "D4"))
+```
+
+
+
+```{r, eval = FALSE}
+
+#gonna try to make an even simpler thing to work with, gonna try it with nov2014 so it's a smaller dataset than say CAcountiesvalues
+
+untidy <- tidy_severity%>%
+  spread(key = category, value = ave_value)
+
+f <- function(x) {
+  ifelse(D4 >0 ,  select(subregion, month, year, D4),
+         ifelse(D3 >0 ,  select(subregion, month, year, D3),
+                ifelse(D2 >0 ,  select(subregion, month, year, D2),
+                       ifelse(D1 >0 ,  select(subregion, month, year, D1),
+                              ifelse(D0 >0 ,  select(subregion, month, year, D0), select(subregion, month, year, NONE))))))
+}
+
+
+f <- function(x) {
+  ifelse(x[8] >0 ,  select(x[1], x[2], x[3], x[8]),
+         ifelse(x[7] >0 ,  select(x[1], x[2], x[3], x[7]), select(x[1], x[2], x[3], x[6])
+                )
+          )
+  }
+```
+
+
+
+```{r}
+
+#this doesn't actually work yet, not sure if I'm going to try to make it work
 #gonna try to plot different months/years
 
 #trying to plot here, testing different data and map info needed
@@ -323,11 +405,42 @@ CAcountiesvalues$month <- factor(CAcountiesvalues$month, levels = c("February", 
 #  theme(axis.line=element_blank(),axis.text.x=element_blank(),axis.text.y=element_blank(),axis.ticks=element_blank(), legend.position="none")
 
 
-ggplot() +   
-  geom_polygon(data = CAcountiesvalues, aes(x = long, y = lat, group = group), color = "grey80", fill = "grey80", size = .1) + 
-  stat_density2d(data = CAcountiesvalues, aes(x = long, y = lat, color = category, fill = ..level.., alpha = ..level..), size = 1,  geom = "polygon") + scale_fill_gradient(low = "yellow", high = "red") + 
-  facet_grid(month ~ year) + 
-  labs(x = "Month", y = "year") +
-    theme(axis.line=element_blank(),axis.text.x=element_blank(),axis.text.y=element_blank(),axis.ticks=element_blank(), legend.position="none")
+#ggplot() +   
+#  geom_polygon(data = may2000, aes(x = long, y = lat, group = group), color = "grey80", fill = "grey80", size = .1) + 
+#  stat_density2d(data = may2000, aes(x = long, y = lat, color = category, fill = category, alpha = ..level..), size = .1,  geom = "polygon") + scale_fill_gradient(low = "yellow", high = "red") + 
+#    theme(axis.line=element_blank(),axis.text.x=element_blank(),axis.text.y=element_blank(),axis.ticks=element_blank(), legend.position="none")
 ```
 
+
+
+```{r}
+#ggplot() + geom_polygon(data = feb2014, aes(x = long, y = lat, group = group,colour = category, alpha = ave_value), color = "black", size = 0.25)  + scale_colour_manual(values=c("firebrick4", "orangered3", "darkorange2", "orange", "yellow1", "snow3")) +  scale_alpha_discrete(range = c(0, 1)) + theme(axis.line=element_blank(),axis.text.x=element_blank(),axis.text.y=element_blank(),axis.ticks=element_blank(), legend.position="none")
+
+
+#ggplot() + geom_polygon(data = CAcounties, aes(x = long, y = lat, group = group), colour = "grey70", size = 0.25) + geom_polygon(data = feb2014, mapping = aes(x = long, y = lat, group=group, fill = category, alpha = ave_value))+ scale_fill_manual(values=c("firebrick4", "orangered3", "darkorange2", "orange", "yellow1", "snow"))
+
+```
+
+
+```{r}
+
+#okay so this makes the really large grid with many maps, may just use this as an overview, then take pieces from it?
+
+CAcountiesvalues%>% 
+  ggplot() + 
+  geom_polygon(aes (x = long, y = lat, group = group, fill = ave_value), colour = "white", size = 0.02)+ scale_fill_gradient(low = "yellow", high = "red") + 
+  facet_grid(category ~ year) +
+  labs(x = "Year", y = "Drought Severity", title = "Drought Severity Over Key Years") +
+  theme(axis.line=element_blank(),axis.text.x=element_blank(),axis.text.y=element_blank(),axis.ticks=element_blank())
+```
+
+Overview analysis: 
+
+
+```{r}
+
+
+```
+
+
+In depth analysis:
