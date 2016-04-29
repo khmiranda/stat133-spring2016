@@ -1,0 +1,151 @@
+---
+title: "Severity of Drought Over Time (Monthly)"
+author: "Tiffany Jann"
+date: "April 22, 2016"
+output: 
+  html_document:
+    fig_height: 7
+    fig_width: 9
+---
+<!-- Don't edit in between this line and the one below -->
+```{r include=FALSE}
+# Don't delete this chunk if you are using the DataComputing package
+library(DataComputing)
+library(lubridate)
+library(reshape2)
+library(ggthemes)
+library(RColorBrewer)
+library(grid)
+library(scales)
+```
+*Source file* 
+```{r, results='asis', echo=FALSE}
+includeSourceDocuments( "/Users/jann/Stat_133_Final_Project/final_severity_monthly.Rmd")
+```
+<!-- Don't edit the material above this line -->
+
+```{r}
+fte_theme <- function() {
+
+  # Generate the colors for the chart procedurally with RColorBrewer
+  palette <- brewer.pal("Greys", n=9)
+  color.background = palette[2]
+  color.grid.major = palette[3]
+  color.axis.text = palette[6]
+  color.axis.title = palette[7]
+  color.title = palette[9]
+
+  # Begin construction of chart
+  theme_bw(base_size=9) +
+
+  # Set the entire chart region to a light gray color
+  theme(panel.background=element_rect(fill=color.background, color=color.background)) +
+  theme(plot.background=element_rect(fill=color.background, color=color.background)) +
+  theme(panel.border=element_rect(color=color.background)) +
+
+  # Format the grid
+  theme(panel.grid.major=element_line(color=color.grid.major,size=.25)) +
+  theme(panel.grid.minor=element_blank()) +
+  theme(axis.ticks=element_blank()) +
+
+  # Format the legend, but hide by default
+  theme(legend.position="none") +
+  theme(legend.background = element_rect(fill=color.background)) +
+  theme(legend.text = element_text(size=7,color=color.axis.title)) +
+
+  # Set title and axis labels, and format these and tick marks
+  theme(plot.title=element_text(color=color.title, size=10, vjust=1.25)) +
+  theme(axis.text.x=element_text(size=7,color=color.axis.text)) +
+  theme(axis.text.y=element_text(size=7,color=color.axis.text)) +
+  theme(axis.title.x=element_text(size=8,color=color.axis.title, vjust=0)) +
+  theme(axis.title.y=element_text(size=8,color=color.axis.title, vjust=1.25)) +
+
+  # Plot margins
+  theme(plot.margin = unit(c(0.35, 0.2, 0.3, 0.35), "cm"))
+}
+```
+
+
+selected data
+```{r}
+timelapse <- "/Users/jann/Stat_133_Final_Project/COUNTY2010-2016.csv"
+timelapse <- timelapse  %>%
+  read.file() %>%
+  select(releaseDate, FIPS, NONE, D0, D1, D2, D3, D4)
+head(timelapse)
+```
+
+data manipulation
+```{r}
+bins <- timelapse %>% mutate(D0=D0-D1, D1=D1-D2, D2=D2-D3, D3=D3-D4, releaseDate = floor_date(lubridate::mdy(releaseDate), "month"))
+
+names(bins)[1] <- "Month"
+
+head(bins)
+```
+
+weighted average
+```{r}
+bins <- bins %>% mutate( FIPS_avg = (1*D0 + 2*D1 + 3*D2 + 4*D3 + 5*D4) /100 - 1) %>% group_by(Month, FIPS) %>% summarise(monthly_avg = round(mean(FIPS_avg)))
+head(bins)
+```
+
+renaming
+```{r}
+drought_levels <- function(x) {
+         (
+          if (x==-1) {
+            "No Drought (NONE)"
+          } else if (x==0) {
+            "Abnormally Dry (D0)"
+          } else if (x==1) {
+            "Moderate Drought (D1)"
+          } else if (x==2) {
+            "Severe Drought (D2)"
+          } else if (x==3) {
+            "Extreme Drought (D3)"
+          } else
+            "Exceptional Drought (D4)"
+         )
+}
+
+bins <- bins %>% mutate(monthly_avg=sapply(monthly_avg,drought_levels))
+head(bins)
+```
+
+plot manipulation
+```{r}
+bins$monthly_avg <- factor(bins$monthly_avg, levels = c("No Drought (NONE)", "Abnormally Dry (D0)", "Moderate Drought (D1)", "Severe Drought (D2)", "Extreme Drought (D3)", "Exceptional Drought (D4)"))
+```
+
+```{r}
+bins <- bins %>% select(Month, monthly_avg)  %>% arrange(Month)
+head(bins) 
+```
+
+```{r}
+bins %>% ggplot(aes(x=Month)) + geom_bar() + scale_colour_brewer() + facet_wrap(~ monthly_avg) + theme_economist() + ggtitle("Number of Counties in Each Drought Level") + ylab("# of Counties") + theme(axis.text.x = element_text(angle = 90, hjust = 1))
+```
+
+```{r eval=F, include=F}
+%>% mutate(Month = ifelse(grepl("03|06|09|12$", bins$Month), reactor_name,""))
+
++ scale_x_discrete(limits=c("2010-03", "2010-06", "2010-09", "2010-12", "2011-03", "2011-06", "2011-09", "2011-12", "2012-03", "2012-06", "2012-09", "2012-12", "2013-03", "2013-06", "2013-09", "2013-12", "2014-03", "2014-06", "2014-09", "2014-12", "2015-03", "2015-06", "2015-09", "2015-12", "2016-03"))
+
+f <- function(vec) {
+  sapply(vec, (ifelse(x==0, 0, 1)))
+}
+%>% 
+  mutate(date = lubridate::ymd(releaseDate))
+
+make_binary <- function(vec) {
+  sapply(vec, (function(x) (ifelse(x==0, 0, 1))))
+}
+
+bins <- timelapse %>% mutate(NONE=make_binary(NONE), D0=make_binary(D0), D1=make_binary(D1), D2=make_binary(D2), D3=make_binary(D3), D4=make_binary(D4)) %>% group_by(releaseDate) %>% arrange(desc(releaseDate))
+
+bins
+
+floor_date(as.POSIXct(releaseDate), "month")
+```
+
