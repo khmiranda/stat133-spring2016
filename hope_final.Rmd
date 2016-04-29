@@ -369,7 +369,7 @@ nov2014$category <- factor(nov2014$category, levels = c("NONE", "D0", "D1", "D2"
 
 ```{r}
 
-#gonna try to make an even simpler thing to work with, so only the highest severity value is kept 
+#gonna try to make an even simpler thing to work with, so only the highest severity value is kept for each county for a given date in my dataframe
 
 untidy <- tidy_severity%>%
   spread(key = category, value = ave_value)
@@ -380,6 +380,10 @@ nov2014 <- CAcountiesvalues%>%
 
 
 nov2014$category <- factor(nov2014$category, levels = c("NONE", "D0", "D1", "D2", "D3", "D4"))
+
+highestnov2014 <- nov2014%>%
+  group_by(year, month, subregion)%>%
+  
 
 ```
 
