@@ -22,7 +22,7 @@ includeSourceDocuments()
 
 
 ```{r}
-water_residential <- "/Users/Hope/Desktop/stats133/uw_supplier_data040416.csv"
+water_residential <- "/Users/jann/stat133-spring2016/uw_supplier_data040416.csv"
 new_water_residential <- water_residential  %>%
   read.file() %>%
   select(Supplier.Name, Stage.Invoked, Mandatory.Restrictions, 
@@ -251,7 +251,7 @@ library(ggmap)
 
 #data set that has drought by county
 
-drought_severity <- "/Users/Hope/Desktop/stats133/countydroughtseverity.csv"
+drought_severity <- "/Users/jann/stat133-spring2016/countydroughtseverity.csv"
 drought_severity <- drought_severity%>%
   read.file()
 drought_severity$county <- gsub(" County", "", drought_severity$county)
