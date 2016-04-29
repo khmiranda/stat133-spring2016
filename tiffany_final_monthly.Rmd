@@ -124,7 +124,7 @@ head(bins)
 ```
 
 ```{r}
-bins %>% ggplot(aes(x=Month, fill=monthly_avg)) + geom_bar() + scale_fill_manual("Drought Severity", values=c("snow", "yellow1", "orange", "darkorange2", "orangered3", "firebrick4")) + facet_wrap(~ monthly_avg) + ggtitle("Number of Counties in Each Drought Level") + ylab("# of Counties") + theme(axis.text.x = element_text(angle = 45, hjust = 1)) + theme(panel.background = element_rect(fill = "grey"),
+bins %>% ggplot(aes(x=Month, fill=monthly_avg)) + geom_bar() + scale_fill_manual("Drought Severity", values=c("#89bdf0", "#fffc67", "orange", "darkorange3", "orangered3", "firebrick4")) + facet_wrap(~ monthly_avg) + ggtitle("Number of Counties in Each Drought Level") + ylab("# of Counties") + theme(axis.text.x = element_text(angle = 45, hjust = 1)) + theme(panel.background = element_rect(fill = "grey"),
         panel.background = element_rect(color = "black"),
         panel.grid.minor = element_line(linetype = "dotted"), 
         axis.title = element_text(size = rel(1.5)),
@@ -135,26 +135,3 @@ bins %>% ggplot(aes(x=Month, fill=monthly_avg)) + geom_bar() + scale_fill_manual
         panel.grid.minor.x = element_blank()) +
   guides(fill=F)
 ```
-
-```{r eval=F, include=F}
-%>% mutate(Month = ifelse(grepl("03|06|09|12$", bins$Month), reactor_name,""))
-
-+ scale_x_discrete(limits=c("2010-03", "2010-06", "2010-09", "2010-12", "2011-03", "2011-06", "2011-09", "2011-12", "2012-03", "2012-06", "2012-09", "2012-12", "2013-03", "2013-06", "2013-09", "2013-12", "2014-03", "2014-06", "2014-09", "2014-12", "2015-03", "2015-06", "2015-09", "2015-12", "2016-03"))
-
-f <- function(vec) {
-  sapply(vec, (ifelse(x==0, 0, 1)))
-}
-%>% 
-  mutate(date = lubridate::ymd(releaseDate))
-
-make_binary <- function(vec) {
-  sapply(vec, (function(x) (ifelse(x==0, 0, 1))))
-}
-
-bins <- timelapse %>% mutate(NONE=make_binary(NONE), D0=make_binary(D0), D1=make_binary(D1), D2=make_binary(D2), D3=make_binary(D3), D4=make_binary(D4)) %>% group_by(releaseDate) %>% arrange(desc(releaseDate))
-
-bins
-
-floor_date(as.POSIXct(releaseDate), "month")
-```
-
