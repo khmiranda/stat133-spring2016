@@ -267,7 +267,7 @@ drought_severity <- data.frame(drought_severity)
 #adding month and year column for later
 drought_severity$releaseDate <- as.Date(drought_severity$releaseDate)
 drought_severity$month <- months(drought_severity$releaseDate)
-drought_severity$year <- years(drought_severity$releaseDate)
+drought_severity$year <- format(drought_severity$releaseDate, "%y")
 
 ```
 
