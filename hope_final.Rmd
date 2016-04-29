@@ -249,7 +249,8 @@ initial analysis: install
 #drought severity in California over time
 
 ```{r}
-
+#install.packages("mapdata")
+#install.packages("ggmap")
 library(mapdata)
 library(ggmap)
 
@@ -267,7 +268,7 @@ drought_severity <- data.frame(drought_severity)
 #adding month and year column for later
 drought_severity$releaseDate <- as.Date(drought_severity$releaseDate)
 drought_severity$month <- months(drought_severity$releaseDate)
-drought_severity$year <- format(drought_severity$releaseDate, "%y")
+drought_severity$year <- year(ymd(drought_severity$releaseDate)) 
 
 ```
 
@@ -279,11 +280,12 @@ drought_severity$year <- format(drought_severity$releaseDate, "%y")
 
 #narrow version of drought_severity only with 2000, 2005, 2010, 2011, 2012, 2013, 2014, 2015
 #taking the average for each month for each category of severity for simplicity
+#
+#  filter(year == "2000" | year == "2005" | year == "2010" | year == "2011" | year == "2012" | year == "2013" | year == "2014" | year == "2015" | year =="2016")%>%
+#  filter(month == "February" | month == "May" | month == "August" | month == "November")%>%
   
 tidy_severity <- drought_severity%>%
   gather(key = category, value = value, NONE, D0, D1, D2, D3, D4)%>%
-  filter(year == "00" | year == "05" | year == "10" | year == "11" | year == "12" | year == "13" | year == "14" | year == "15" | year =="16")%>%
-  filter(month == "February" | month == "May" | month == "August" | month == "November")%>%
   select(subregion, month, year, category, value)%>%
     group_by(month, year, subregion, category)%>%
   summarise(ave_value = mean(value))
@@ -308,13 +310,13 @@ CAcountiesvalues <- CAcounties%>%
 #creating levels for mapping later
 CAcountiesvalues$category <- factor(CAcountiesvalues$category, levels = c("D4", "D3", "D2", "D1", "D0", "NONE"))
 
-CAcountiesvalues$month <- factor(CAcountiesvalues$month, levels = c("February", "May", "August", "November"))
+CAcountiesvalues$month <- factor(CAcountiesvalues$month, levels = c("January", "February", "March", "April", "May","June", "July", "August","September", "October", "November","December"))
 
 ```
 
 
 
-```{r}
+```{r, eval = FALSE}
 #smaller data sets for specific months and years
 
 #february 2000
@@ -365,28 +367,20 @@ nov2014$category <- factor(nov2014$category, levels = c("NONE", "D0", "D1", "D2"
 
 
 
-```{r, eval = FALSE}
+```{r}
 
-#gonna try to make an even simpler thing to work with, gonna try it with nov2014 so it's a smaller dataset than say CAcountiesvalues
+#gonna try to make an even simpler thing to work with, so only the highest severity value is kept 
 
 untidy <- tidy_severity%>%
   spread(key = category, value = ave_value)
 
-f <- function(x) {
-  ifelse(D4 >0 ,  select(subregion, month, year, D4),
-         ifelse(D3 >0 ,  select(subregion, month, year, D3),
-                ifelse(D2 >0 ,  select(subregion, month, year, D2),
-                       ifelse(D1 >0 ,  select(subregion, month, year, D1),
-                              ifelse(D0 >0 ,  select(subregion, month, year, D0), select(subregion, month, year, NONE))))))
-}
+#november 2014
+nov2014 <- CAcountiesvalues%>%
+  filter(month == "November", year == 14)
 
 
-f <- function(x) {
-  ifelse(x[8] >0 ,  select(x[1], x[2], x[3], x[8]),
-         ifelse(x[7] >0 ,  select(x[1], x[2], x[3], x[7]), select(x[1], x[2], x[3], x[6])
-                )
-          )
-  }
+nov2014$category <- factor(nov2014$category, levels = c("NONE", "D0", "D1", "D2", "D3", "D4"))
+
 ```
 
 
