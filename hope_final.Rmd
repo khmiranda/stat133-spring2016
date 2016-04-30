@@ -252,7 +252,7 @@ Time to plot!
         legend.text = element_text(size = rel(1.0)),
         plot.title = element_text(size = rel(2))
         ) +
-  scale_colour_manual("")
+  scale_colour_manual("Scope of Water Usage", values = c("green", "blue","yellow"))
 ```
 
 ##Analysis of Case Study
@@ -339,7 +339,7 @@ CAcountiesvalues%>%
 
 
 --------------
-same as tiff's
+
 
 selected data
 ```{r}
