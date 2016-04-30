@@ -233,7 +233,6 @@ Time to plot!
   geom_point() + 
   stat_smooth(se=FALSE, method="loess") +
   labs(x = "Month", y = "Average Residential Water Usage", title = "Water Usage vs Month: in LA County and all 9 Bay Area Counties") +
-  theme_economist() +
   theme(legend.key = element_rect(colour = "black"),
         plot.background = element_rect(colour = "grey"),
         panel.background = element_rect(fill = "grey"),
