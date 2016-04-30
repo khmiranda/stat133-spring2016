@@ -450,7 +450,7 @@ binscounties <- data.frame(binscounties)
 
 another map of each month since 2000 to april 2014
 
-```{r, fig.width=14, fig.height=22}
+```{r, fig.width=14, fig.height=24}
 binscounties%>% 
   ggplot() + 
   geom_polygon(aes (x = long, y = lat, group = group, fill = monthly_avg), colour = "white", size = 0.02)+
