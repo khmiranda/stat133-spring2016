@@ -224,6 +224,15 @@ alljoined <- la_state%>%
 narrowall <- alljoined%>%
   gather(key = boundary, value = avg_resid_use, state_use_avg, la_use_avg, bay_use_avg)
 
+narrowall$boundary <- gsub("state_use_avg", "California Average Water Usage", narrowall$boundary)
+
+narrowall$boundary <- gsub("la_use_avg", "Los Angeles County Average Water Usage", narrowall$boundary)
+
+narrowall$boundary <- gsub("bay_use_avg", "All 9 Bay Area Counties Average Water Usage", narrowall$boundary)
+
+
+
+
 ```
 
 Time to plot!
@@ -232,16 +241,18 @@ Time to plot!
   ggplot(narrowall, aes(x=Reporting.Month, y= avg_resid_use, color = boundary)) +
   geom_point() + 
   stat_smooth(se=FALSE, method="loess") +
-  labs(x = "Month", y = "Average Residential Water Usage", title = "Water Usage vs Month: in LA County and all 9 Bay Area Counties") +
+  labs(x = "Month", y = "Average Residential Water Usage", title = "Water Usage vs Month") +
   theme(legend.key = element_rect(colour = "black"),
         plot.background = element_rect(colour = "grey"),
         panel.background = element_rect(fill = "grey"),
         panel.background = element_rect(color = "black"),
         panel.grid.minor = element_line(linetype = "dotted"), 
         axis.title = element_text(size = rel(1.5)),
+        axis.text = element_text(size = rel(1.0)),
         legend.text = element_text(size = rel(1.0)),
         plot.title = element_text(size = rel(2))
-        )
+        ) +
+  scale_colour_manual("")
 ```
 
 ##Analysis of Case Study
