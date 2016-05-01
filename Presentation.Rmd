@@ -28,7 +28,7 @@ library(dplyr)
 ```
 
 
-```{r include=FALSE}
+```{r, include=FALSE}
 timelapse <- "final_COUNTY2011-2016.csv"
 timelapse <- timelapse  %>%
   read.file() %>%
@@ -70,7 +70,7 @@ bins <- bins %>% select(Month, monthly_avg)  %>% arrange(Month)
 
 *** =left
 Tiffany
-```{r echo=FALSE, fig.height=2, fig.width=4.5}
+```{r, echo=FALSE, fig.height=2, fig.width=4.5}
 
 bins %>% ggplot(aes(x=Month, fill=monthly_avg)) + geom_bar() + 
  scale_fill_manual("Drought Severity", values=c("#7baad8", "#fffc67", "orange", "darkorange3", "orangered3", "firebrick4")) + facet_wrap(~ monthly_avg) + ggtitle("Number of Counties in Each Drought Level") + ylab("# of Counties") + theme(axis.text.x = element_text(angle = 45, hjust = 1)) + theme(panel.background = element_rect(fill = "grey"),
@@ -113,8 +113,6 @@ binscounties%>%
 ```
 
 *** =fullwidth
-
-
 
 ```{r include=FALSE}
 #install.packages("mapdata")
@@ -278,21 +276,321 @@ binscounties%>%
 
 ```
 
-## Slide with Bullets
+## Second slide
 
-- Bullet 1
-- Bullet 2
-- Bullet 3
+```{r, echo = FALSE}
+water_residential <- "/Users/noosharazavian/Desktop/uw_supplier_data040416.csv"
+water_residential <- water_residential  %>%
+  read.file() %>%
+  select(Supplier.Name, Stage.Invoked, Mandatory.Restrictions, 
+         Reporting.Month, 
+         CALCULATED.R.GPCD.Reporting.Month..Values.calculated.by.Water.Board.staff.using.methodology.available.at.http...www.waterboards.ca.gov.waterrights.water_issues.programs.drought.docs.ws_tools.guidance_estimate_res_gpcd.pdf., 
+         Hydrologic.Region, 
+         Penalties.Assessed, 
+         X..Residential.Use,
+         Water.Days.Allowed.Week,
+         Conservation.Standard..starting.in.June.2015.) %>% 
+  mutate(reporting_month = lubridate::mdy(Reporting.Month), 
+         policy_enacted = ifelse(reporting_month < as.numeric(ymd("2015-04-15")), 0, 1),
+         state_mandatory_restrictions = ifelse(policy_enacted == 1, "After \nState Restrictions", "Before \nState Restrictions"),
+    month_dummies = ifelse(reporting_month %in% ymd(c("2014-06-15", "2015-06-15")), 6, 
+                    ifelse(reporting_month %in% ymd(c("2014-07-15", "2015-07-15")), 7,
+                    ifelse(reporting_month %in% ymd(c("2014-08-15", "2015-08-15")), 8,
+                    ifelse(reporting_month %in% ymd(c("2014-09-15", "2015-09-15")), 9,
+                    ifelse(reporting_month %in% ymd(c("2014-10-15", "2015-10-15")), 10,
+                    ifelse(reporting_month %in% ymd(c("2014-11-15", "2015-11-15")), 11,
+                    ifelse(reporting_month %in% ymd(c("2015-12-15", "2016-12-15")), 12,
+                    ifelse(reporting_month %in% ymd(c("2015-01-15","2016-01-15")), 1,
+                    ifelse(reporting_month %in% ymd(c("2015-02-15","2016-02-15")), 2,                      ifelse(reporting_month == ymd(c("2015-03-15")), 3,                                     ifelse(reporting_month == ymd(c("2015-04-15")), 4, 5))))))))))))        
+water_residential$state_mandatory_restrictions <- factor(water_residential$state_mandatory_restrictions, levels = c("Before \nState Restrictions", "After \nState Restrictions"))
+  
+names(water_residential)[names(water_residential) == 'CALCULATED.R.GPCD.Reporting.Month..Values.calculated.by.Water.Board.staff.using.methodology.available.at.http...www.waterboards.ca.gov.waterrights.water_issues.programs.drought.docs.ws_tools.guidance_estimate_res_gpcd.pdf.'] <- 'resid_use'
+```
 
-## Slide with R Code and Output
+***=left
 
 ```{r}
-summary(cars)
+water_residential %>% 
+  ggplot(aes(x=reporting_month, y= resid_use)) +
+  geom_point() + 
+  geom_jitter() +
+  geom_vline(aes(xintercept = as.numeric(ymd("2015-04-01"))), color = "red", size=1.5) +
+  xlab("Reported Months") +
+  ylab("Residential Water Usage (Gallons-per-Capita-per-Day)") +
+  ggtitle("2014-2016 Reported California Residential Water Usage") +
+  geom_smooth() +
+  theme(panel.background = element_rect(fill = "grey"),
+        axis.title = element_text(size = rel(1.5)),
+        axis.text = element_text(size = rel(1.0)),
+        legend.text = element_text(size = rel(1.0)),
+        plot.title = element_text(size = rel(2.5)))
 ```
 
-## Slide with Plot
+#Statistical Analysis: 
 
-```{r, echo=FALSE}
-plot(cars)
+```{r, echo = FALSE}
+fixed <- felm(resid_use ~ policy_enacted | Supplier.Name + month_dummies, data=water_residential)
 ```
 
+***=right
+```{r, results='asis'}
+stargazer(fixed, type="html", omit = NULL, dep.var.labels=c("Residential Water Use (R-GPCD)"), out="models.htm")
+```
+
+```{r, echo = FALSE}
+month_water_residential <- water_residential  %>%
+  mutate(overtime_use = ifelse(resid_use <= 100.00, "0-100",
+                    ifelse(resid_use <= 200.00, "101-200",                                                 ifelse(resid_use <= 300.00, "201-300",
+                     ifelse(resid_use <= 400.00, "301-400",
+                        "400+"))))) %>%
+  group_by(overtime_use, reporting_month, month_dummies) %>%
+  summarise(total = n())
+```
+
+***= left
+```{r}
+month_water_residential %>% 
+  ggplot(aes(x=reporting_month, y = total, group =  overtime_use, fill=overtime_use, color = overtime_use )) +
+  geom_bar(stat="identity", position="identity") +
+  geom_line(size = 1) +
+  scale_fill_manual(name="Residental Usage\n(Gallons-per-Capita-per-Day)",
+                    values=c("#08519C", "#3182BD", "#6BAED6", "#6a51a3", "#ae017e"),
+                    breaks=c("0-100", "101-200", "201-300", "301-400", "400+"),
+                    labels=c("0-100", "101-200", "201-300","301-400", "400+")) +
+  geom_vline(aes(xintercept = as.numeric(ymd("2015-04-01"))), color = "red", size=1.5) +
+  scale_colour_manual(name="Residental Usage\n(Gallons-per-Capita-per-Day)",
+                    values=c("#08519C", "#3182BD", "#6BAED6", "#6a51a3", "#ae017e"),
+                    breaks=c("0-100", "101-200", "201-300", "301-400", "400+"),
+                    labels=c("0-100", "101-200", "201-300","301-400", "400+")) +
+  geom_label_repel(
+    data = subset(month_water_residential, reporting_month %in% ymd(c("2014-06-15", "2015-04-15","2016-02-15"))),
+    aes(label = total),
+    size = 6, color = "white",
+    fontface = 'bold',
+    box.padding = unit(0.25, "lines"),
+    point.padding = unit(0.25, "lines"),
+    show.legend=FALSE) + 
+  theme(panel.background = element_rect(fill = "grey"), 
+        axis.title = element_text(size = rel(1.5)),
+        axis.text = element_text(size = rel(1.0)),
+        legend.text = element_text(size = rel(1.0)),
+        plot.title = element_text(size = rel(2)),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank()) +
+  ylab("Number of Water Supplier Agencies") +
+  xlab("Reported Months") +
+  ggtitle("2014-2016 Reported California Residential Water Usage \nby Number of Water Supplier Agencies") 
+```
+
+#Case Study: Bay Area Counties vs Los Angeles County, who is doing their part? 
+
+```{r}
+#los angeles water suppliers
+#want all of los angeles county so any water supplier that matches the cities within LA county
+#some gsub to get this nice list of the cities in LA county
+
+lacities <- "Agoura Hills Alhambra Arcadia Artesia Avalon Azusa Baldwin Park Bell Bell Gardens Bellflower Beverly Hills Bradbury Burbank Calabasas Carson Cerritos Claremont Commerce Compton Covina Cudahy Culver City Diamond Bar Downey Duarte El Monte El Segundo Gardena Glendale Glendora Hawaiian Gardens Hawthorne Hermosa Beach Hidden Hills Huntington Park Industry Inglewood Irwindale La Cañada Flintridge La Habra Heights La Mirada La Puente La Verne Lakewood Lancaster Lawndale Lomita Long Beach Los Angeles Lynwood Malibu Manhattan Beach Maywood Monrovia Montebello Monterey Park Norwalk Palmdale Palos Verdes Estates Paramount Pasadena Pico Rivera Pomona Rancho Palos Verdes Redondo Beach Rolling Hills Rolling Hills Estates Rosemead San Dimas San Fernando San Gabriel San Marino Santa Clarita Santa Fe Springs Santa Monica Sierra Madre Signal Hill South El Monte South Gate South Pasadena Temple City Torrance Vernon Walnut West Covina West Hollywood Westlake Village Whittier"
+lacities <- gsub(" " , ")|(" , lacities)
+
+lacities
+
+#NOT SHOWN:then manually put a . in between cities with more than one word in the name to account for spaces
+#below is the dataset that only has los angeles county levels of water usage
+
+losangeles.avg <- new_water_residential%>%
+  filter(grepl("(Agoura.Hills)|(Alhambra)|(Arcadia)|(Artesia)|(Avalon)|(Azusa)|(Baldwin.Park)|(Bell)|(Bell.Gardens)|(Bellflower)|(Beverly.Hills)|(Bradbury)|(Burbank)|(Calabasas)|(Carson)|(Cerritos)|(Claremont)|(Commerce)|(Compton)|(Covina)|(Cudahy)|(Culver.City)|(Diamond.Bar)|(Downey)|(Duarte)|(El.Monte)|(El.Segundo)|(Gardena)|(Glendale)|(Glendora)|(Hawaiian)|(Gardens)|(Hawthorne)|(Hermosa.Beach)|(Hidden.Hills)|(Huntington.Park)|(Industry)|(Inglewood)|(Irwindale)|(La.Cañada.Flintridge)|(La.Habra.Heights)|(La.Mirada)|(La.Puente)|(La.Verne)|(Lakewood)|(Lancaster)|(Lawndale)|(Lomita)|(Long.Beach)|(Los.Angeles)|(Lynwood)|(Malibu)|(Manhattan.Beach)|(Maywood)|(Monrovia)|(Montebello)|(Monterey.Park)|(Norwalk)|(Palmdale)|(Palos.Verdes.Estates)|(Paramount)|(Pasadena)|(Pico.Rivera)|(Pomona)|(Rancho)|(Palos.Verdes)|(Redondo.Beach)|(Rolling.Hills)|(Rolling.Hills.Estates)|(Rosemead)|(San.Dimas)|(San.Fernando)|(San.Gabriel)|(San.Marino)|(Santa.Clarita)|(Santa.Fe.Springs)|(Santa.Monica)|(Sierra.Madre)|(Signal.Hill)|(South.El.Monte)|(South.Gate)|(South.Pasadena)|(Temple.City)|(Torrance)|(Vernon)|(Walnut)|(West.Covina)|(West.Hollywood)|(Westlake)|(Village)|(Whittier)", Supplier.Name))%>%
+  group_by(Reporting.Month)%>%
+  summarise(la_use_avg = mean(resid_use))
+```
+
+
+```{r}
+#there are multiple counties surrounding the bay: SF, Marin, Sonoma, Napa, Solano, Contra Costa, Alameda, Santa Clara, and San Mateo. Eastbay
+
+sfbay <- "Alameda, California
++ Albany, California
++ American Canyon, California
++ Antioch, California
++ Atherton, California
++ B
++ Belmont, California
++ Belvedere, California
++ Benicia, California
++ Berkeley, California
++ Brentwood, California
++ Brisbane, California
++ Burlingame, California
++ C
++ Calistoga, California
++ Campbell, California
++ Clayton, California
++ Cloverdale, California
++ Colma, California
++ Concord, California
++ Corte Madera, California
++ Cotati, California
++ Cupertino, California
++ D
++ Daly City, California
++ Danville, California
++ Dixon, California
++ Dublin, California
++ E
++ East Palo Alto, California
++ El Cerrito, California
++ Emeryville, California
++ F
++ Fairfax, California
++ Foster City, California
++ Fremont, California
++ G
++ Gilroy, California
++ H
++ Half Moon Bay, California
++ Hayward, California
++ Healdsburg, California
++ Hercules, California
++ Hillsborough, California
++ L
++ Lafayette, California
++ Larkspur, California
++ Livermore, California
++ Los Altos, California
++ Los Altos Hills, California
++ Los Gatos, California
++ M
++ Martinez, California
++ Menlo Park, California
++ Mill Valley, California
++ Millbrae, California
++ Milpitas, California
++ Monte Sereno, California
++ Moraga, California
++ Morgan Hill, California
++ Mountain View, California
++ N
++ Napa, California
++ Newark, California
++ Novato, California
++ O
++ Oakland, California
++ Oakley, California
++ Orinda, California
++ P
++ Pacifica, California
++ Palo Alto, California
++ Petaluma, California
++ Piedmont, California
++ Pinole, California
++ Pittsburg, California
++ Pleasant Hill, California
++ Pleasanton, California
++ Portola Valley, California
++ R
++ Redwood City, California
++ Richmond, California
++ Rio Vista, California
++ Rohnert Park, California
++ Ross, California
++ S
++ St. Helena, California
++ San Anselmo, California
++ San Carlos, California
++ San Francisco
++ San Jose, California
++ San Leandro, California
++ San Mateo, California
++ San Pablo, California
++ San Rafael, California
++ San Ramon, California
++ Santa Clara, California
++ Santa Rosa, California
++ Saratoga, California
++ Sausalito, California
++ Sebastopol, California
++ Sonoma, California
++ South San Francisco, California
++ Suisun City, California
++ Sunnyvale, California
++ T
++ Tiburon, California
++ U
++ Union City, California
++ V
++ Vacaville, California
++ Vallejo, California
++ W
++ Walnut Creek, California
++ Windsor, California
++ Woodside, California
++ Y
++ Yountville, California"
+
+sfbay <- gsub("California", "", sfbay) #get rid of california
+sfbay <- gsub("\n[A-Z]\n", "", sfbay) #get rid of the headers for each section of cities beginning with a certain letter
+sfbay <- gsub("\n", "", sfbay) #getting rid of extra newlines
+sfbay <- gsub(", " , ")|(", sfbay) #inputting the separations for when I use grepl later
+
+sfbay  #want to look at it so I can copy/paste and make small edits for when I use it in grepl
+
+
+bayavg <-  new_water_residential%>%
+  filter(grepl( "(Alameda)|(Albany)|(American.Canyon)|(Antioch)|(Atherton)|(Belmont)|(Belvedere)|(Benicia)|(Berkeley)|(Brentwood)|(Brisbane)|(Burlingame)|(Calistoga)|(Campbell)|(Clayton)|(Cloverdale)|(Colma)|(Concord)|(Corte.Madera)|(Cotati)|(Cupertino)|(Daly.City)|(Danville)|(Dixon)|(Dublin)|(East.Palo.Alto)|(El.Cerrito)|(Emeryville)|(Fairfax)|(Foster.City)|(Fremont)|(Gilroy)|(Half.Moon.Bay)|(Hayward)|(Healdsburg)|(Hercules)|(Hillsborough)|(Lafayette)|(Larkspur)|(Livermore)|(Los.Altos)|(Los.Altos.Hills)|(Los.Gatos)|(Martinez)|(Menlo.Park)|(Mill.Valley)|(Millbrae)|(Milpitas)|(Monte.Sereno)|(Moraga)|(Morgan.Hill)|(Mountain.View)|(Napa)|(Newark)|(Novato)|(Oakland)|(Oakley)|(Orinda)|(Pacifica)|(Palo.Alto)|(Petaluma)|(Piedmont)|(Pinole)|(Pittsburg)|(Pleasant.Hill)|(Pleasanton)|(Portola.Valley)|(Redwood.City)|(Richmond)|(Rio.Vista)|(Rohnert.Park)|(Ross)|(St..Helena)|(San.Anselmo)|(San.Carlos)|(San.FranciscoSan.Jose)|(San.Leandro)|(San.Mateo)|(San.Pablo)|(San.Rafael)|(San.Ramon)|(Santa.Clara)|(Santa.Rosa)|(Saratoga)|(Sausalito)|(Sebastopol)|(Sonoma)|(South.San.Francisco)|(Suisun.City)|(Sunnyvale)|(Tiburon)|(Union.City)|(Vacaville)|(Vallejo)|(Walnut.Creek)|(Windsor)|(Woodside)|(Yountville)|(East.Bay)", Supplier.Name ))%>%
+  group_by(Reporting.Month)%>%
+  summarise(bay_use_avg = mean(resid_use))
+
+```
+
+```{r}
+# we want to compare to california as a whole so let's take the average for every month for the whole state!
+
+state.avg <- new_water_residential%>%
+  group_by(Reporting.Month)%>%
+  summarise(state_use_avg = mean(resid_use))
+```
+
+Now let's combine all three of these datasets so that we have just one dataset we're plotting from
+
+```{r}
+la_state <- state.avg%>%
+  inner_join(losangeles.avg, by = c("Reporting.Month" = "Reporting.Month"))
+
+alljoined <- la_state%>%
+  inner_join(bayavg, by = c("Reporting.Month" = "Reporting.Month"))
+
+#now that I have everything joined, I have to make it tidy
+#using gather to make it narrow
+
+narrowall <- alljoined%>%
+  gather(key = boundary, value = avg_resid_use, state_use_avg, la_use_avg, bay_use_avg)
+
+narrowall$boundary <- gsub("state_use_avg", "California", narrowall$boundary)
+
+narrowall$boundary <- gsub("la_use_avg", "Los Angeles County", narrowall$boundary)
+
+narrowall$boundary <- gsub("bay_use_avg", "All 9 Bay Area Counties", narrowall$boundary)
+
+
+
+
+```
+
+Time to plot!
+
+```{r}
+  ggplot(narrowall, aes(x=Reporting.Month, y= avg_resid_use, color = boundary)) +
+  geom_point() + 
+  stat_smooth(se=FALSE, method="loess") +
+  labs(x = "Month", y = "Average Residential Water Usage", title = "Average Residential Water Usage vs Month") +
+  theme(legend.key = element_rect(colour = "black"),
+        plot.background = element_rect(colour = "grey"),
+        panel.background = element_rect(fill = "grey"),
+        panel.background = element_rect(color = "black"),
+        panel.grid.minor = element_line(linetype = "dotted"), 
+        axis.title = element_text(size = rel(1.5)),
+        axis.text = element_text(size = rel(1.0)),
+        legend.text = element_text(size = rel(1.0)),
+        plot.title = element_text(size = rel(2))
+        ) +
+  scale_colour_manual("Region", values = c("green", "blue","yellow"))
+```
