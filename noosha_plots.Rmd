@@ -1,0 +1,179 @@
+---
+title: "Final Project- Rough Draft"
+author: "Noosha Razavian"
+date: ""
+output: 
+  html_document:
+    fig_height: 8
+    fig_width: 12
+---
+<!-- Don't edit in between this line and the one below -->
+```{r include=FALSE}
+# Don't delete this chunk if you are using the DataComputing package
+library(DataComputing)
+library(printr)
+library(rvest)
+library(lubridate)
+library(dplyr)
+library(ggrepel)
+library(stargazer)
+library(lfe)
+```
+*Source file* 
+```{r, results='asis', echo=FALSE}
+includeSourceDocuments()
+```
+<!-- Don't edit the material above this line -->
+
+
+```{r}
+water_residential <- "/Users/noosharazavian/Desktop/uw_supplier_data040416.csv"
+water_residential <- water_residential  %>%
+  read.file() %>%
+  select(Supplier.Name, Stage.Invoked, Mandatory.Restrictions, 
+         Reporting.Month, 
+         CALCULATED.R.GPCD.Reporting.Month..Values.calculated.by.Water.Board.staff.using.methodology.available.at.http...www.waterboards.ca.gov.waterrights.water_issues.programs.drought.docs.ws_tools.guidance_estimate_res_gpcd.pdf., 
+         Hydrologic.Region, 
+         Penalties.Assessed, 
+         X..Residential.Use,
+         Water.Days.Allowed.Week,
+         Conservation.Standard..starting.in.June.2015.) %>% 
+  mutate(reporting_month = lubridate::mdy(Reporting.Month), 
+         policy_enacted = ifelse(reporting_month < as.numeric(ymd("2015-04-15")), 0, 1),
+         state_mandatory_restrictions = ifelse(policy_enacted == 1, "After \nState Restrictions", "Before \nState Restrictions"),
+    month_dummies = ifelse(reporting_month %in% ymd(c("2014-06-15", "2015-06-15")), 6, 
+                    ifelse(reporting_month %in% ymd(c("2014-07-15", "2015-07-15")), 7,
+                    ifelse(reporting_month %in% ymd(c("2014-08-15", "2015-08-15")), 8,
+                    ifelse(reporting_month %in% ymd(c("2014-09-15", "2015-09-15")), 9,
+                    ifelse(reporting_month %in% ymd(c("2014-10-15", "2015-10-15")), 10,
+                    ifelse(reporting_month %in% ymd(c("2014-11-15", "2015-11-15")), 11,
+                    ifelse(reporting_month %in% ymd(c("2015-12-15", "2016-12-15")), 12,
+                    ifelse(reporting_month %in% ymd(c("2015-01-15","2016-01-15")), 1,
+                    ifelse(reporting_month %in% ymd(c("2015-02-15","2016-02-15")), 2,                      ifelse(reporting_month == ymd(c("2015-03-15")), 3,                                     ifelse(reporting_month == ymd(c("2015-04-15")), 4, 5))))))))))))        
+water_residential$state_mandatory_restrictions <- factor(water_residential$state_mandatory_restrictions, levels = c("Before \nState Restrictions", "After \nState Restrictions"))
+  
+names(water_residential)[names(water_residential) == 'CALCULATED.R.GPCD.Reporting.Month..Values.calculated.by.Water.Board.staff.using.methodology.available.at.http...www.waterboards.ca.gov.waterrights.water_issues.programs.drought.docs.ws_tools.guidance_estimate_res_gpcd.pdf.'] <- 'resid_use'
+```
+
+```{r}
+water_residential %>% 
+  ggplot(aes(x=reporting_month, y= resid_use)) +
+  geom_point() + 
+  geom_jitter() +
+  geom_vline(aes(xintercept = as.numeric(ymd("2015-04-01"))), color = "red", size=1.5) +
+  xlab("Reported Months") +
+  ylab("Residential Water Usage (Gallons-per-Capita-per-Day)") +
+  ggtitle("2014-2016 Reported California Residential Water Usage") +
+  geom_smooth() +
+  theme(panel.background = element_rect(fill = "grey"),
+        axis.title = element_text(size = rel(1.5)),
+        axis.text = element_text(size = rel(1.0)),
+        legend.text = element_text(size = rel(1.0)),
+        plot.title = element_text(size = rel(2.5)))
+```
+
+#Statistical Analysis: 
+
+```{r}
+fixed <- felm(resid_use ~ policy_enacted | Supplier.Name + month_dummies, data=water_residential)
+```
+
+```{r, results='asis'}
+stargazer(fixed, type="html", omit = NULL, dep.var.labels=c("Residential Water Use (R-GPCD)"), out="models.htm")
+```
+
+```{r}
+month_water_residential <- water_residential  %>%
+  mutate(overtime_use = ifelse(resid_use <= 100.00, "0-100",
+                    ifelse(resid_use <= 200.00, "101-200",                                                 ifelse(resid_use <= 300.00, "201-300",
+                     ifelse(resid_use <= 400.00, "301-400",
+                        "400+"))))) %>%
+  group_by(overtime_use, reporting_month, month_dummies) %>%
+  summarise(total = n())
+```
+
+```{r}
+month_water_residential %>% 
+  ggplot(aes(x=reporting_month, y=total, group = overtime_use, color = overtime_use)) +
+  geom_line(size = 1) +
+  geom_vline(aes(xintercept = as.numeric(ymd("2015-04-01"))), color = "red", size=1.5) +
+  theme(panel.background = element_rect(fill = "grey"),
+        panel.background = element_rect(color = "black"),
+        panel.grid.minor = element_line(linetype = "dotted"), 
+        axis.title = element_text(size = rel(1.5)),
+        axis.text = element_text(size = rel(1.0)),
+        legend.text = element_text(size = rel(1.0)),
+        plot.title = element_text(size = rel(2))) +
+  scale_colour_manual(values=c("#08519C", "#3182BD", "#6BAED6", "#6a51a3", "#ae017e"),
+                    name="Residental Usage\n(Gallons-per-Capita-per-Day)",
+                    breaks=c("0-100", 
+                               "101-200",
+                               "201-300", 
+                               "301-400",
+                               "400+"),
+                    labels=c("0-100", "101-200", "201-300","301-400", "400+")) +
+  geom_label_repel(
+    data = subset(month_water_residential, reporting_month %in% ymd(c("2014-06-15", "2015-04-15","2016-02-15"))),
+    aes(label = total),
+    size = 6,
+    fontface = 'bold',
+    box.padding = unit(0.25, "lines"),
+    point.padding = unit(0.25, "lines"),
+    show.legend=FALSE) +
+  ylab("Number of Water Supplier Agencies") +
+  xlab("Reported Months") +
+  ggtitle("2014-2016 Reported California Residential Water Usage \nby Number of Water Supplier Agencies")
+```
+
+```{r}
+month_water_residential %>% 
+  ggplot(aes(x=reporting_month, y = total, fill=overtime_use)) +
+  geom_bar(stat="identity", position="identity") +
+  scale_fill_manual(values=c("#08519C", "#3182BD", "#6BAED6", "#6a51a3", "#ae017e"),
+                      name="Residental Usage\n(Gallons-per-Capita-per-Day)") +
+  geom_vline(aes(xintercept = as.numeric(ymd("2015-04-01"))), color = "red", size=1.5) +
+  theme(panel.background = element_rect(fill = "grey"), 
+        axis.title = element_text(size = rel(1.5)),
+        axis.text = element_text(size = rel(1.0)),
+        legend.text = element_text(size = rel(1.0)),
+        plot.title = element_text(size = rel(2)),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank()) +
+  ylab("Number of Water Supplier Agencies") +
+  xlab("Reported Months") +
+  ggtitle("2014-2016 Reported California Residential Water Usage \nby Number of Water Supplier Agencies")
+```
+
+```{r}
+month_water_residential %>% 
+  ggplot(aes(x=reporting_month, y = total, group =  overtime_use, fill=overtime_use, color = overtime_use )) +
+  geom_bar(stat="identity", position="identity") +
+  geom_line(size = 1) +
+  scale_fill_manual(name="Residental Usage\n(Gallons-per-Capita-per-Day)",
+                    values=c("#08519C", "#3182BD", "#6BAED6", "#6a51a3", "#ae017e"),
+                    breaks=c("0-100", "101-200", "201-300", "301-400", "400+"),
+                    labels=c("0-100", "101-200", "201-300","301-400", "400+")) +
+  geom_vline(aes(xintercept = as.numeric(ymd("2015-04-01"))), color = "red", size=1.5) +
+  scale_colour_manual(name="Residental Usage\n(Gallons-per-Capita-per-Day)",
+                    values=c("#08519C", "#3182BD", "#6BAED6", "#6a51a3", "#ae017e"),
+                    breaks=c("0-100", "101-200", "201-300", "301-400", "400+"),
+                    labels=c("0-100", "101-200", "201-300","301-400", "400+")) +
+  geom_label_repel(
+    data = subset(month_water_residential, reporting_month %in% ymd(c("2014-06-15", "2015-04-15","2016-02-15"))),
+    aes(label = total),
+    size = 6, color = "white",
+    fontface = 'bold',
+    box.padding = unit(0.25, "lines"),
+    point.padding = unit(0.25, "lines"),
+    show.legend=FALSE) + 
+  theme(panel.background = element_rect(fill = "grey"), 
+        axis.title = element_text(size = rel(1.5)),
+        axis.text = element_text(size = rel(1.0)),
+        legend.text = element_text(size = rel(1.0)),
+        plot.title = element_text(size = rel(2)),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank()) +
+  ylab("Number of Water Supplier Agencies") +
+  xlab("Reported Months") +
+  ggtitle("2014-2016 Reported California Residential Water Usage \nby Number of Water Supplier Agencies") 
+```
