@@ -1,0 +1,113 @@
+---
+title: "Severity of Drought Over Time (Yearly)"
+author: "Tiffany Jann"
+date: "April 27, 2016"
+output: 
+  html_document:
+    fig_height: 7
+    fig_width: 9
+---
+<!-- Don't edit in between this line and the one below -->
+```{r include=FALSE}
+# Don't delete this chunk if you are using the DataComputing package
+library(DataComputing)
+library(lubridate)
+library(reshape2)
+library(ggthemes)
+library(RColorBrewer)
+library(grid)
+library(scales)
+```
+*Source file* 
+```{r, results='asis', echo=FALSE}
+includeSourceDocuments()
+```
+<!-- Don't edit the material above this line -->
+
+selected data
+```{r}
+timelapse <- "/Users/jann/stat133-spring2016/final_COUNTY2000-2016.csv"
+timelapse <- timelapse %>%
+  read.file() %>%
+  select(releaseDate, FIPS, NONE, D0, D1, D2, D3, D4)
+head(timelapse)
+```
+
+data manipulation
+```{r}
+bins <- timelapse %>% mutate(D0=D0-D1, D1=D1-D2, D2=D2-D3, D3=D3-D4, releaseDate = year(ymd(releaseDate)))
+
+names(bins)[1] <- "Year"
+
+head(bins)
+```
+
+weighted average
+```{r}
+bins <- bins %>% mutate( FIPS_avg = (1*D0 + 2*D1 + 3*D2 + 4*D3 + 5*D4) /100 - 1) %>% group_by(Year, FIPS) %>% summarise(yearly_avg = round(mean(FIPS_avg)))
+head(bins)
+```
+
+renaming
+```{r}
+drought_levels <- function(x) {
+         (
+          if (x==-1) {
+            "No Drought (NONE)"
+          } else if (x==0) {
+            "Abnormally Dry (D0)"
+          } else if (x==1) {
+            "Moderate Drought (D1)"
+          } else if (x==2) {
+            "Severe Drought (D2)"
+          } else if (x==3) {
+            "Extreme Drought (D3)"
+          } else
+            "Exceptional Drought (D4)"
+         )
+}
+
+bins <- bins %>% mutate(yearly_avg=sapply(yearly_avg,drought_levels))
+head(bins)
+```
+
+plot manipulation
+```{r}
+bins$yearly_avg <- factor(bins$yearly_avg, levels = c("No Drought (NONE)", "Abnormally Dry (D0)", "Moderate Drought (D1)", "Severe Drought (D2)", "Extreme Drought (D3)", "Exceptional Drought (D4)"))
+```
+
+```{r}
+bins <- bins %>% select(Year, yearly_avg)  %>% arrange(Year)
+head(bins) 
+```
+
+```{r}
+bins %>% ggplot(aes(x=Year)) + geom_bar(aes(color=Year, fill= yearly_avg)) + 
+ scale_fill_manual("Drought Severity", values=c("#7baad8", "#fffc67", "orange", "darkorange3", "orangered3", "firebrick4")) + facet_wrap(~ yearly_avg) + ggtitle("Number of Counties in Each Drought Level") + ylab("# of Counties") + theme(axis.text.x = element_text(angle = 45, hjust = 1)) + theme(panel.background = element_rect(fill = "grey"),
+        panel.background = element_rect(color = "black"),
+        panel.grid.minor = element_line(linetype = "dotted"), 
+        axis.title = element_text(size = rel(1.5)),
+        axis.text = element_text(size = rel(1.0)),
+        legend.text = element_text(size = rel(1.0)),
+        plot.title = element_text(size = rel(2)),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank())
+```
+
+```{r}
+info <- bins %>% group_by(Year, yearly_avg) %>% summarise(total = n())
+head(info)
+```
+
+```{r}
+info %>% ggplot(aes(x=Year, y=total, fill=yearly_avg)) + geom_bar(stat="identity", alpha=0.9) + 
+ scale_fill_manual("Drought Severity", values=c("#7baad8", "#fffc67", "orange", "darkorange3", "orangered3", "firebrick4")) + ggtitle("Drought Levels from 2000-2016") + ylab("# of Counties") + theme(axis.text.x = element_text(angle = 45, hjust = 1)) + theme(panel.background = element_rect(fill = "grey"),
+        panel.background = element_rect(color = "black"),
+        panel.grid.minor = element_line(linetype = "dotted"), 
+        axis.title = element_text(size = rel(1.5)),
+        axis.text = element_text(size = rel(1.0)),
+        legend.text = element_text(size = rel(1.0)),
+        plot.title = element_text(size = rel(2)),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank())
+```

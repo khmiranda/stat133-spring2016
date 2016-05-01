@@ -4,7 +4,7 @@ author: "Hope Miranda"
 date: ""
 output: 
   html_document:
-    fig_height: 5
+    fig_height: 7
     fig_width: 12
 ---
 <!-- Don't edit in between this line and the one below -->
@@ -13,6 +13,8 @@ output:
 library(DataComputing)
 library(car)
 library(lubridate)
+library(dplyr)
+library(ggthemes)
 ```
 *Source file* 
 ```{r, results='asis', echo=FALSE}
@@ -222,6 +224,15 @@ alljoined <- la_state%>%
 narrowall <- alljoined%>%
   gather(key = boundary, value = avg_resid_use, state_use_avg, la_use_avg, bay_use_avg)
 
+narrowall$boundary <- gsub("state_use_avg", "California", narrowall$boundary)
+
+narrowall$boundary <- gsub("la_use_avg", "Los Angeles County", narrowall$boundary)
+
+narrowall$boundary <- gsub("bay_use_avg", "All 9 Bay Area Counties", narrowall$boundary)
+
+
+
+
 ```
 
 Time to plot!
@@ -230,22 +241,33 @@ Time to plot!
   ggplot(narrowall, aes(x=Reporting.Month, y= avg_resid_use, color = boundary)) +
   geom_point() + 
   stat_smooth(se=FALSE, method="loess") +
-  labs(x = "Month", y = "Average Residential Water Usage", title = "Water Usage vs Month: in LA County and all 9 Bay Area Counties") +
-  theme_minimal() + 
-  theme(plot.title = element_text(size = 25),
-        axis.title.x = element_text(size = 18),
-        axis.title.y = element_text(size = 18) 
-        )
+  labs(x = "Month", y = "Average Residential Water Usage", title = "Average Residential Water Usage vs Month") +
+  theme(legend.key = element_rect(colour = "black"),
+        plot.background = element_rect(colour = "grey"),
+        panel.background = element_rect(fill = "grey"),
+        panel.background = element_rect(color = "black"),
+        panel.grid.minor = element_line(linetype = "dotted"), 
+        axis.title = element_text(size = rel(1.5)),
+        axis.text = element_text(size = rel(1.0)),
+        legend.text = element_text(size = rel(1.0)),
+        plot.title = element_text(size = rel(2))
+        ) +
+  scale_colour_manual("Region", values = c("green", "blue","yellow"))
 ```
 
 ##Analysis of Case Study
 
-initial analysis: install
+initial analysis: Most important thing to note is that the average usage for Bay Area counties are consistently lower than LA county usage. Overall California trend, LA, and Bay area all follow similar seasonal changes in usage. 
+
+
+
+
 
 #drought severity in California over time
 
 ```{r}
-
+#install.packages("mapdata")
+#install.packages("ggmap")
 library(mapdata)
 library(ggmap)
 
@@ -258,32 +280,263 @@ drought_severity$county <- gsub(" County", "", drought_severity$county)
 drought_severity$county <- sapply(drought_severity$county, tolower)
 
 names(drought_severity)[names(drought_severity) == "county"] <- "subregion"
+drought_severity <- data.frame(drought_severity)
+
+#adding month and year column for later
+drought_severity$releaseDate <- as.Date(drought_severity$releaseDate)
+drought_severity$month <- months(drought_severity$releaseDate)
+drought_severity$year <- year(ymd(drought_severity$releaseDate)) 
+
+```
+
+
+```{r}
+#narrow version of drought_severity 
+#taking the average for each month for each category of severity for simplicity
+
+tidy_severity <- drought_severity%>%
+  gather(key = category, value = value, NONE, D0, D1, D2, D3, D4)%>%
+  select(subregion, month, year, category, value, FIPS)%>%
+    group_by(month, year, subregion, category)%>%
+  summarise(ave_value = mean(value))
+
+#just making sure everything is in the correct format for ease of plotting
+tidy_severity <- data.frame(tidy_severity)
+tidy_severity$year <- as.numeric(tidy_severity$year)
 
 
 #coordinates for the california counties
 CAcounties <- map_data('county')%>%
   filter(region == "california")
-
-#joining two previous data sets so it's all in one
-drought_coord <- drought_severity%>%
-  inner_join(CAcounties, by = "subregion" )
+CAcounties <- data.frame(CAcounties)
 
 
-#would rather use this over drought_severity but trying to figure out what kind of variables are necessary in the dataset and the map data for geom_map
-
-#new_drought <- drought_coord%>%
-#+ group_by(year(releaseDate), long, lat, order, group, subregion)%>%
-#+ summarise(avepercent = mean(percentCurrent))
-
-#names(new_drought)[names(new_drought) == "year(releaseDate)"] <- "year"
+#merge drought information with coordinates for each county
+CAcountiesvalues <- CAcounties%>%
+  right_join(tidy_severity, by = "subregion")
 
 
+#creating levels for mapping later
+CAcountiesvalues$category <- factor(CAcountiesvalues$category, levels = c("D4", "D3", "D2", "D1", "D0", "NONE"))
 
-#trying to plot here, testing different data and map info needed
+CAcountiesvalues$month <- factor(CAcountiesvalues$month, levels = c("January", "February", "March", "April", "May","June", "July", "August","September", "October", "November","December"))
 
-#drought_severity%>%
-#  ggplot() + 
-#  geom_map(aes(x = long, y = lat, group = group, map_id = 'subregion', fill = avepercent), map = CAcounties) + 
-#  facet_wrap(~year)
 ```
 
+
+
+```{r}
+
+#okay so this makes the really large grid with many maps, may just use this as an overview, then take pieces from it?
+
+CAcountiesvalues%>% 
+  ggplot() + 
+  geom_polygon(aes (x = long, y = lat, group = group, fill = ave_value), colour = "white", size = 0.02)+ scale_fill_gradient(low = "yellow", high = "red") + 
+  facet_grid(category ~ year) +
+  labs(x = "Year", y = "Drought Severity", title = "Drought Severity vs Year") +
+  theme(axis.line=element_blank(),axis.text.x=element_blank(),axis.text.y=element_blank(),axis.ticks=element_blank())
+```
+
+#Comments
+
+Well this one doesn't necessarily need to be used since we have better maps below, but if you did want to include this I would mention how in the two previous droughts in California, no counties reached "Exceptional Drought" levels, in contrast to 2014-2016 when multiple counties are registering as having "Exceptional Drought" levels. This in conjunction with Tiffany's plot of # of counties vs drought level would be interesting side by side, because in these maps you can see that for 2014 and 2015 there were no counties that had "NONE" or no level of drought, and in 2016 we see some counties highlighted again. So Tiffany's plot should tell us what number of counties there are that have "NONE" while this one shows where. 
+
+--------------
+
+
+selected data
+```{r}
+timelapse <- "/Users/jann/stat133-spring2016/countydroughtseverity.csv"
+timelapse <- timelapse  %>%
+  read.file() %>%
+  select(releaseDate, county, FIPS, NONE, D0, D1, D2, D3, D4)
+head(timelapse)
+```
+
+data manipulation
+```{r}
+bins <- timelapse %>% mutate(D0=D0-D1, D1=D1-D2, D2=D2-D3, D3=D3-D4)
+
+bins$releaseDate <- as.Date(bins$releaseDate)
+bins$month <- months(bins$releaseDate)
+bins$year <- year(ymd(bins$releaseDate)) 
+
+head(bins)
+```
+
+weighted average
+```{r}
+bins <- bins %>% mutate( FIPS_avg = (1*D0 + 2*D1 + 3*D2 + 4*D3 + 5*D4) /100 - 1) %>% group_by(month, year, FIPS, county) %>% summarise(monthly_avg = round(mean(FIPS_avg)))
+
+bins$county <- gsub(" County", "", bins$county)
+bins$county <- sapply(bins$county, tolower)
+
+names(bins)[names(bins) == "county"] <- "subregion"
+bins<- data.frame(bins)
+
+head(bins)
+```
+
+```{r}
+drought_levels <- function(x) {
+         (
+          if (x==-1) {
+            "No Drought (NONE)"
+          } else if (x==0) {
+            "Abnormally Dry (D0)"
+          } else if (x==1) {
+            "Moderate Drought (D1)"
+          } else if (x==2) {
+            "Severe Drought (D2)"
+          } else if (x==3) {
+            "Extreme Drought (D3)"
+          } else
+            "Exceptional Drought (D4)"
+         )
+}
+
+bins <- bins %>% mutate(monthly_avg=sapply(monthly_avg,drought_levels))
+head(bins)
+
+```
+
+
+```{r}
+binscounties <- bins%>%
+  right_join(CAcounties, by = c("subregion"))
+
+```
+plot manipulation
+```{r}
+binscounties$month <- factor(binscounties$month, levels = c("January", "February", "March", "April", "May","June", "July", "August","September", "October", "November","December"))
+
+binscounties$monthly_avg <- factor(binscounties$monthly_avg, levels = c("No Drought (NONE)", "Abnormally Dry (D0)", "Moderate Drought (D1)", "Severe Drought (D2)", "Extreme Drought (D3)", "Exceptional Drought (D4)"))
+```
+
+-------------
+
+```{r}
+binscounties <- binscounties %>%
+  group_by(year)%>%
+  arrange(month)%>%
+  mutate(completedate = (paste(month, year)))
+
+head(binscounties) 
+
+```
+
+create levels for all months/years
+
+```{r}
+months <- c("January", "February", "March", "April", "May","June", "July", "August","September", "October", "November","December")
+
+months <- rep(months, times = 17)
+
+years <- rep(2000:2016, each = 12)
+
+monthsyears <- paste(months, years)
+
+monthsyears <- monthsyears[1:(length(monthsyears) - 8)]
+
+monthsyears
+
+binscounties$completedate <- factor(levels = c(monthsyears), binscounties$completedate)
+
+
+binscounties$completedate <- as.factor( binscounties$completedate)
+
+binscounties <- data.frame(binscounties)
+```
+
+another map of each month since 2000 to april 2014
+
+```{r, fig.width=14, fig.height=24}
+binscounties%>% 
+  ggplot() + 
+  geom_polygon(aes (x = long, y = lat, group = group, fill = monthly_avg), colour = "white", size = 0.02)+
+  facet_wrap(~completedate, ncol = 12, nrow = 17, drop = TRUE) +
+  labs(x = "Month", y = "Year", title = "Drought Severity in California from 2000 to Present") +
+  theme(axis.line=element_blank(),
+        axis.text=element_blank(),
+        axis.ticks=element_blank(),
+        panel.grid.major = element_blank(),	
+        panel.grid.minor = element_blank(), 
+        legend.key = element_rect(colour = "black"),
+        plot.background = element_rect(colour = "grey"),
+        panel.background = element_rect(fill = "grey"),
+        panel.background = element_rect(color = "black"),
+        panel.grid.minor = element_line(linetype = "dotted"), 
+        axis.title = element_text(size = rel(1.5)),
+        legend.text = element_text(size = rel(1.0)),
+        plot.title = element_text(size = rel(2))
+        ) + 
+ scale_fill_manual("Drought Severity", values=c("#7baad8", "#fffc67", "orange", "darkorange3", "orangered3", "firebrick4")) 
+```
+
+
+map from 2006-2010 to capture the previous drought in California
+
+```{r, fig.width=14, fig.height=8}
+binscounties%>%
+  filter(year >= 2006, year <= 2010)%>%
+    ggplot() + 
+  geom_polygon(aes (x = long, y = lat, group = group, fill = monthly_avg), colour = "white", size = 0.02)+
+  facet_wrap(~completedate, ncol = 12, nrow = 5, drop = TRUE) +
+  labs(x = "Month", y = "Year", title = "Previous Drought in California from 2006 to 2010") +
+  theme(axis.line=element_blank(),
+        axis.text=element_blank(),
+        axis.ticks=element_blank(),
+        panel.grid.major = element_blank(),	
+        panel.grid.minor = element_blank(), 
+        legend.key = element_rect(colour = "black"),
+        plot.background = element_rect(colour = "grey"),
+        panel.background = element_rect(fill = "grey"),
+        panel.background = element_rect(color = "black"),
+        axis.title = element_text(size = rel(1.5)),
+        legend.text = element_text(size = rel(1.0)),
+        plot.title = element_text(size = rel(2))
+        ) + 
+ scale_fill_manual("Drought Severity", values=c("#7baad8", "#fffc67", "orange", "darkorange3", "orangered3", "firebrick4"))
+```
+
+
+map from 2011 to Present to show current drought:
+
+```{r, fig.width=14, fig.height=8}
+binscounties%>%
+  filter(year >= 2011)%>%
+  ggplot() + 
+  geom_polygon(aes (x = long, y = lat, group = group, fill = monthly_avg), colour = "white", size = 0.02)+
+  facet_wrap(~completedate, ncol = 12, drop = TRUE) +
+  labs(x = "Month", y = "Year", title = "Drought Severity in California from 2011 to Present") +
+  theme(axis.line=element_blank(),
+        axis.text=element_blank(),
+        axis.ticks=element_blank(),
+        panel.grid.major = element_blank(),	
+        panel.grid.minor = element_blank(), 
+        legend.key = element_rect(colour = "black"),
+        plot.background = element_rect(colour = "grey"),
+        panel.background = element_rect(fill = "grey"),
+        panel.background = element_rect(color = "black"),
+        panel.grid.minor = element_line(linetype = "dotted"), 
+        axis.title = element_text(size = rel(1.5)),
+        legend.text = element_text(size = rel(1.0)),
+        plot.title = element_text(size = rel(2))
+        ) + 
+  theme(axis.line=element_blank(),axis.text.x=element_blank(),axis.text.y=element_blank(),axis.ticks=element_blank()) + 
+ scale_fill_manual("Drought Severity", values=c("#7baad8", "#fffc67", "orange", "darkorange3", "orangered3", "firebrick4"))
+
+```
+
+
+#Overview analysis/comments
+
+So the first "overview" maps may be too much to put into the presentation, because the image needs to be very large to show anything useful. I definitely think the contrast is good to see, but maybe the "Previous Drought" and the "Current Drought" maps will be enough to show how much worse off we are currently. Again, I think this in conjunction with the plot that Tiff made will be good together
+
+
+
+
+
+
+
+##In depth analysis:
