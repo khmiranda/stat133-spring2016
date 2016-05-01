@@ -24,7 +24,7 @@ includeSourceDocuments()
 
 
 ```{r}
-water_residential <- "/Users/jann/stat133-spring2016/uw_supplier_data040416.csv"
+water_residential <- "uw_supplier_data040416.csv"
 new_water_residential <- water_residential  %>%
   read.file() %>%
   select(Supplier.Name, Stage.Invoked, Mandatory.Restrictions, 
@@ -273,7 +273,7 @@ library(ggmap)
 
 #data set that has drought by county
 
-drought_severity <- "/Users/jann/stat133-spring2016/countydroughtseverity.csv"
+drought_severity <- "final_COUNTY2000-2016.csv"
 drought_severity <- drought_severity%>%
   read.file()
 drought_severity$county <- gsub(" County", "", drought_severity$county)
@@ -346,7 +346,7 @@ Well this one doesn't necessarily need to be used since we have better maps belo
 
 selected data
 ```{r}
-timelapse <- "/Users/jann/stat133-spring2016/countydroughtseverity.csv"
+timelapse <- "final_COUNTY2000-2016.csv"
 timelapse <- timelapse  %>%
   read.file() %>%
   select(releaseDate, county, FIPS, NONE, D0, D1, D2, D3, D4)

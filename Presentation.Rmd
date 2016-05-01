@@ -6,8 +6,6 @@ output:
   ioslides_presentation:
     incremental: true
     transition: default
-    fig_height: 2
-    fig_width: 3
 ---
 
 
@@ -32,20 +30,13 @@ timelapse <- "/Users/jann/stat133-spring2016/final_COUNTY2011-2016.csv"
 timelapse <- timelapse  %>%
   read.file() %>%
   select(releaseDate, FIPS, NONE, D0, D1, D2, D3, D4)
-```
 
-
-```{r include=FALSE}
 bins <- timelapse %>% mutate(D0=D0-D1, D1=D1-D2, D2=D2-D3, D3=D3-D4, releaseDate = floor_date(lubridate::ymd(releaseDate), "month"))
 
 names(bins)[1] <- "Month"
-```
 
-```{r include=FALSE}
 bins <- bins %>% mutate( FIPS_avg = (1*D0 + 2*D1 + 3*D2 + 4*D3 + 5*D4) /100 - 1) %>% group_by(Month, FIPS) %>% summarise(monthly_avg = round(mean(FIPS_avg)))
-```
 
-```{r include=FALSE}
 drought_levels <- function(x) {
          (
           if (x==-1) {
@@ -64,18 +55,14 @@ drought_levels <- function(x) {
 }
 
 bins <- bins %>% mutate(monthly_avg=sapply(monthly_avg,drought_levels))
-```
 
-```{r include=FALSE}
 bins$monthly_avg <- factor(bins$monthly_avg, levels = c("No Drought (NONE)", "Abnormally Dry (D0)", "Moderate Drought (D1)", "Severe Drought (D2)", "Extreme Drought (D3)", "Exceptional Drought (D4)"))
-```
 
-```{r include=FALSE}
 bins <- bins %>% select(Month, monthly_avg)  %>% arrange(Month)
 ```
 
 
-```{r echo=FALSE}
+```{r echo=FALSE, fig.height=2, fig.width=4.5}
 bins %>% ggplot(aes(x=Month, fill=monthly_avg)) + geom_bar() + 
  scale_fill_manual("Drought Severity", values=c("#7baad8", "#fffc67", "orange", "darkorange3", "orangered3", "firebrick4")) + facet_wrap(~ monthly_avg) + ggtitle("Number of Counties in Each Drought Level") + ylab("# of Counties") + theme(axis.text.x = element_text(angle = 45, hjust = 1)) + theme(panel.background = element_rect(fill = "grey"),
         panel.background = element_rect(color = "black"),
@@ -111,10 +98,6 @@ drought_severity$releaseDate <- as.Date(drought_severity$releaseDate)
 drought_severity$month <- months(drought_severity$releaseDate)
 drought_severity$year <- year(ymd(drought_severity$releaseDate)) 
 
-```
-
-
-```{r include=FALSE}
 #narrow version of drought_severity 
 #taking the average for each month for each category of severity for simplicity
 
@@ -145,11 +128,6 @@ CAcountiesvalues$category <- factor(CAcountiesvalues$category, levels = c("D4", 
 
 CAcountiesvalues$month <- factor(CAcountiesvalues$month, levels = c("January", "February", "March", "April", "May","June", "July", "August","September", "October", "November","December"))
 
-```
-
-
-
-```{r include=FALSE}
 
 #okay so this makes the really large grid with many maps, may just use this as an overview, then take pieces from it?
 
@@ -167,20 +145,13 @@ timelapse <- "/Users/jann/stat133-spring2016/final_COUNTY2011-2016.csv"
 timelapse <- timelapse  %>%
   read.file() %>%
   select(releaseDate, county, FIPS, NONE, D0, D1, D2, D3, D4)
-head(timelapse)
-```
 
-```{r include=FALSE}
 bins <- timelapse %>% mutate(D0=D0-D1, D1=D1-D2, D2=D2-D3, D3=D3-D4)
 
 bins$releaseDate <- as.Date(bins$releaseDate)
 bins$month <- months(bins$releaseDate)
 bins$year <- year(ymd(bins$releaseDate)) 
 
-head(bins)
-```
-
-```{r include=FALSE}
 bins <- bins %>% mutate( FIPS_avg = (1*D0 + 2*D1 + 3*D2 + 4*D3 + 5*D4) /100 - 1) %>% group_by(month, year, FIPS, county) %>% summarise(monthly_avg = round(mean(FIPS_avg)))
 
 bins$county <- gsub(" County", "", bins$county)
@@ -189,10 +160,6 @@ bins$county <- sapply(bins$county, tolower)
 names(bins)[names(bins) == "county"] <- "subregion"
 bins<- data.frame(bins)
 
-head(bins)
-```
-
-```{r include=FALSE}
 drought_levels <- function(x) {
          (
           if (x==-1) {
@@ -213,31 +180,18 @@ drought_levels <- function(x) {
 bins <- bins %>% mutate(monthly_avg=sapply(monthly_avg,drought_levels))
 head(bins)
 
-```
-
-```{r include=FALSE}
 binscounties <- bins%>%
   right_join(CAcounties, by = c("subregion"))
 
-```
-
-```{r include=FALSE}
 binscounties$month <- factor(binscounties$month, levels = c("January", "February", "March", "April", "May","June", "July", "August","September", "October", "November","December"))
 
 binscounties$monthly_avg <- factor(binscounties$monthly_avg, levels = c("No Drought (NONE)", "Abnormally Dry (D0)", "Moderate Drought (D1)", "Severe Drought (D2)", "Extreme Drought (D3)", "Exceptional Drought (D4)"))
-```
 
-```{r include=FALSE}
 binscounties <- binscounties %>%
   group_by(year)%>%
   arrange(month)%>%
   mutate(completedate = (paste(month, year)))
 
-head(binscounties) 
-
-```
-
-```{r include=FALSE}
 months <- c("January", "February", "March", "April", "May","June", "July", "August","September", "October", "November","December")
 
 months <- rep(months, times = 17)
@@ -258,9 +212,7 @@ binscounties$completedate <- as.factor( binscounties$completedate)
 binscounties <- data.frame(binscounties)
 ```
 
-
-
-```{r, echo=FALSE}
+```{r, echo=FALSE, fig.height=2, fig.width=6}
 binscounties%>%
   filter(year >= 2011)%>%
   ggplot() + 

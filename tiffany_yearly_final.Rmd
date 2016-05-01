@@ -26,7 +26,7 @@ includeSourceDocuments()
 
 selected data
 ```{r}
-timelapse <- "/Users/jann/stat133-spring2016/final_COUNTY2000-2016.csv"
+timelapse <- "final_COUNTY2000-2016.csv"
 timelapse <- timelapse %>%
   read.file() %>%
   select(releaseDate, FIPS, NONE, D0, D1, D2, D3, D4)
