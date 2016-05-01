@@ -124,7 +124,7 @@ library(ggmap)
 
 #data set that has drought by county
 
-drought_severity <- "/Users/jann/stat133-spring2016/countydroughtseverity.csv"
+drought_severity <- "final_COUNTY2000-2016.csv"
 drought_severity <- drought_severity%>%
   read.file()
 drought_severity$county <- gsub(" County", "", drought_severity$county)
@@ -181,7 +181,7 @@ CAcountiesvalues%>%
 
 
 ```{r include=FALSE}
-timelapse <- "/Users/jann/stat133-spring2016/final_COUNTY2011-2016.csv"
+timelapse <- "final_COUNTY2011-2016.csv"
 timelapse <- timelapse  %>%
   read.file() %>%
   select(releaseDate, county, FIPS, NONE, D0, D1, D2, D3, D4)
