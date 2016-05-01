@@ -346,7 +346,7 @@ Well this one doesn't necessarily need to be used since we have better maps belo
 
 selected data
 ```{r}
-timelapse <- "/Users/Hope/Desktop/stats133/countydroughtseverity.csv"
+timelapse <- "/Users/jann/stat133-spring2016/countydroughtseverity.csv"
 timelapse <- timelapse  %>%
   read.file() %>%
   select(releaseDate, county, FIPS, NONE, D0, D1, D2, D3, D4)
