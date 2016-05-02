@@ -25,7 +25,7 @@ includeSourceDocuments()
 <!-- Don't edit the material above this line -->
 
 ```{r}
-usage <- "C:\\Users\\Megan\\Desktop\\usagedataset.csv"
+usage <- "usagedataset.csv"
 table <- usage %>%
   read.file() %>%
   select(Supplier_Name,ResUse, Penalties_Assessed, Reporting_Month, Percent_ResUse, Mandatory_Restrictions,ReportedProd, Prod13, CS) %>%
