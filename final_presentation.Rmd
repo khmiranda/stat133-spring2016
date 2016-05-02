@@ -554,31 +554,15 @@ summary(linear)
 
 **Question 1: How have CA drought conditions changed since the drought started in 2011?**
 
-<!-- Limit image width and height -->
-<style type="text/css">
-img {     
-  max-height: 560px;     
-  max-width: 964px; 
-}
-</style>
- 
-<!-- Center image on slide -->
-<script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.7.min.js"></script>
-<script type="text/javascript">
-$(function() {     
-  $("p:has(img)").addClass('centered'); 
-});
-</script>
-
 *** =left width:90%
-```{r, fig.width=17.5, fig.height=19.5, echo=FALSE, warning=FALSE}
+```{r, fig.width=7.25, fig.height=8, echo=FALSE, warning=FALSE}
 binscounties%>%
   filter(year >= 2011)%>%
   na.omit()%>%
   ggplot() + 
   geom_polygon(aes (x = long, y = lat, group = group, fill = monthly_avg), colour = "white", size = 0.02)+
   facet_wrap(~completedate, ncol = 8, drop = TRUE) +
-  ggtitle("Drought Severity:\n2011-Present") +
+  ggtitle("Drought Severity: 2011-Present") +
   #xlab("Month") + ylab("Year") +
   theme(axis.line=element_blank(),
         axis.text=element_blank(),
@@ -592,11 +576,11 @@ binscounties%>%
         panel.grid.minor = element_line(linetype = "dotted"), 
         #axis.title = element_text(size = rel(1.5)),
         axis.title = element_blank(),
-        legend.key.size = unit(1.25, "cm"),
-        strip.text.x = element_text(size=20),
-        legend.text = element_text(size = rel(2)),
-        plot.title = element_text(size = rel(4)),
-        legend.title = element_text(size = rel(3))
+        legend.key.size = unit(.5, "cm"),
+        strip.text.x = element_text(size=8.5),
+        legend.text = element_text(size = rel(.75)),
+        plot.title = element_text(size = rel(2)),
+        legend.title = element_text(size = rel(1))
         ) + 
   theme(axis.line=element_blank(),axis.text.x=element_blank(),axis.text.y=element_blank(),axis.ticks=element_blank()) + 
  scale_fill_manual("Drought Severity", values=c("#7baad8", "#fffc67", "orange", "darkorange3", "orangered3", "firebrick4"))
@@ -651,22 +635,14 @@ stargazer(fixed, type="html", omit = NULL, dep.var.labels=c("Residential Water U
 ***=right width:30%
 
 ```{r, echo=FALSE, warning=FALSE, fig.width=7, fig.height=5}
-
-#bottom left
-
 month_water_residential %>% 
-  ggplot(aes(x=reporting_month, y = total, group =  overtime_use, fill=overtime_use, color = overtime_use )) +
+  ggplot(aes(x=reporting_month, y = total, group =  overtime_use, fill=overtime_use)) +
   geom_bar(stat="identity", position="identity") +
-  geom_line(size = 1) +
-  scale_fill_manual(name="Residental Usage\n(Gallons-per-\nCapita-per-Day)",
+  scale_fill_manual(name="Residental Usage\n(Gallons-per-Capita-per-Day)",
                     values=c("#08519C", "#3182BD", "#6BAED6", "#6a51a3", "#ae017e"),
                     breaks=c("0-100", "101-200", "201-300", "301-400", "400+"),
                     labels=c("0-100", "101-200", "201-300","301-400", "400+")) +
   geom_vline(aes(xintercept = as.numeric(ymd("2015-04-01"))), color = "red", size=1.5) +
-  scale_colour_manual(name="Residental Usage\n(Gallons-per-\nCapita-per-Day)",
-                    values=c("#08519C", "#3182BD", "#6BAED6", "#6a51a3", "#ae017e"),
-                    breaks=c("0-100", "101-200", "201-300", "301-400", "400+"),
-                    labels=c("0-100", "101-200", "201-300","301-400", "400+")) +
   geom_label_repel(
     data = subset(month_water_residential, reporting_month %in% ymd(c("2014-06-15", "2015-04-15","2016-02-15"))),
     aes(label = total),
@@ -675,16 +651,16 @@ month_water_residential %>%
     box.padding = unit(0.25, "lines"),
     point.padding = unit(0.25, "lines"),
     show.legend=FALSE) + 
- theme(panel.background = element_rect(fill = "grey"),
+  theme(panel.background = element_rect(fill = "grey"), 
         axis.title = element_text(size = rel(1.5)),
-        axis.text = element_text(size = rel(.9)),
+        axis.text = element_text(size = rel(1.0)),
         legend.text = element_text(size = rel(1.0)),
-        plot.title = element_text(size = rel(1.5)),
+        plot.title = element_text(size = rel(2)),
         panel.grid.major.x = element_blank(),
         panel.grid.minor.x = element_blank()) +
   ylab("Number of Water Supplier Agencies") +
   xlab("Reported Months") +
-  ggtitle("2014-2016 Reported California Residential Water \nUsage by Number of Water Supplier Agencies") 
+  ggtitle("2014-2016 Reported California Residential Water Usage \nby Number of Water Supplier Agencies") 
 ```
 
 --- &twocol

@@ -146,18 +146,13 @@ month_water_residential %>%
 
 ```{r}
 month_water_residential %>% 
-  ggplot(aes(x=reporting_month, y = total, group =  overtime_use, fill=overtime_use, color = overtime_use )) +
+  ggplot(aes(x=reporting_month, y = total, group =  overtime_use, fill=overtime_use)) +
   geom_bar(stat="identity", position="identity") +
-  geom_line(size = 1) +
   scale_fill_manual(name="Residental Usage\n(Gallons-per-Capita-per-Day)",
                     values=c("#08519C", "#3182BD", "#6BAED6", "#6a51a3", "#ae017e"),
                     breaks=c("0-100", "101-200", "201-300", "301-400", "400+"),
                     labels=c("0-100", "101-200", "201-300","301-400", "400+")) +
   geom_vline(aes(xintercept = as.numeric(ymd("2015-04-01"))), color = "red", size=1.5) +
-  scale_colour_manual(name="Residental Usage\n(Gallons-per-Capita-per-Day)",
-                    values=c("#08519C", "#3182BD", "#6BAED6", "#6a51a3", "#ae017e"),
-                    breaks=c("0-100", "101-200", "201-300", "301-400", "400+"),
-                    labels=c("0-100", "101-200", "201-300","301-400", "400+")) +
   geom_label_repel(
     data = subset(month_water_residential, reporting_month %in% ymd(c("2014-06-15", "2015-04-15","2016-02-15"))),
     aes(label = total),

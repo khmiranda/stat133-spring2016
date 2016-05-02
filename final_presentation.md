@@ -44,22 +44,6 @@ knit        : slidify::knit2slides
 
 **Question 1: How have CA drought conditions changed since the drought started in 2011?**
 
-<!-- Limit image width and height -->
-<style type="text/css">
-img {     
-  max-height: 560px;     
-  max-width: 964px; 
-}
-</style>
- 
-<!-- Center image on slide -->
-<script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.7.min.js"></script>
-<script type="text/javascript">
-$(function() {     
-  $("p:has(img)").addClass('centered'); 
-});
-</script>
-
 *** =left width:90%
 ![plot of chunk unnamed-chunk-14](assets/fig/unnamed-chunk-14-1.png)
 
