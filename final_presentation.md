@@ -40,15 +40,15 @@ knit        : slidify::knit2slides
 
 ---
 
-## HTMN: California Drought & Residential Water Usage 
+## HTMN: CA Drought & Residential Water Usage 
 
-**Question 1: How have CA drought conditions changed since the drought started in 2011?**
+**How have CA drought conditions changed since the drought started in 2011?**
 
 ![plot of chunk unnamed-chunk-14](assets/fig/unnamed-chunk-14-1.png)
 
 --- &twocol 
 
-**Question 2: How has residential water usage changed since the enactment of the statewide mandatory reductions in April 2015?**
+**How has residential water usage changed since the enactment of the statewide mandatory reductions in April 2015?**
 
 *** =left width:70%
 ![plot of chunk unnamed-chunk-15](assets/fig/unnamed-chunk-15-1.png)
@@ -73,12 +73,14 @@ knit        : slidify::knit2slides
 
 --- &twocol
 
-**Questions 3 & 4: Have penalties on urban water suppliers affected residential water usage? Since June 2015, have urban water suppliers been meeting their required conservation standards?**
+*** =left width:60%
 
-*** =left width:50%
+**Have penalties on urban water suppliers affected residential water usage?**
+
 ![plot of chunk unnamed-chunk-18](assets/fig/unnamed-chunk-18-1.png)
 
 
-*** =right width:50%
+*** =right width:40%
 
+**Since June 2015, have urban water suppliers been meeting their required conservation standards?**
 ![plot of chunk unnamed-chunk-19](assets/fig/unnamed-chunk-19-1.png)

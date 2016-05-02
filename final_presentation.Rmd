@@ -550,9 +550,9 @@ summary(linear)
 
 ---
 
-## HTMN: California Drought & Residential Water Usage 
+## HTMN: CA Drought & Residential Water Usage 
 
-**Question 1: How have CA drought conditions changed since the drought started in 2011?**
+**How have CA drought conditions changed since the drought started in 2011?**
 
 ```{r, fig.width=13.5, fig.height=7, echo=FALSE, warning=FALSE}
 binscounties%>%
@@ -588,7 +588,7 @@ binscounties%>%
 
 --- &twocol 
 
-**Question 2: How has residential water usage changed since the enactment of the statewide mandatory reductions in April 2015?**
+**How has residential water usage changed since the enactment of the statewide mandatory reductions in April 2015?**
 
 *** =left width:70%
 ```{r, echo=FALSE, fig.width=7, fig.height=5, warning=FALSE}
@@ -600,13 +600,13 @@ water_residential %>%
   geom_vline(aes(xintercept = as.numeric(ymd("2015-04-01"))), color = "red", size=1.5) +
   xlab("Reported Months") +
   ylab("Residential Water Usage \n(Gallons-per-Capita-per-Day)") +
-  ggtitle("2014-2016 Reported California Residential Water Usage") +
+  ggtitle("2014-2016 Reported CA Residential Water Usage") +
   geom_smooth() +
   theme(panel.background = element_rect(fill = "grey"),
-        axis.title = element_text(size = rel(1.5)),
+        axis.title = element_text(size = rel(1.33)),
         axis.text = element_text(size = rel(1.0)),
         legend.text = element_text(size = rel(1.0)),
-        plot.title = element_text(size = rel(1.5)))
+        plot.title = element_text(size = rel(1.66)))
 ```
 
 ```{r, results='asis', warning=FALSE, echo=FALSE, fig.width=4, fig.height=1}
@@ -634,54 +634,68 @@ month_water_residential %>%
     point.padding = unit(0.25, "lines"),
     show.legend=FALSE) + 
   theme(panel.background = element_rect(fill = "grey"), 
-        axis.title = element_text(size = rel(1.5)),
+        axis.title = element_text(size = rel(1.33)),
         axis.text = element_text(size = rel(1.0)),
         legend.text = element_text(size = rel(1.0)),
-        plot.title = element_text(size = rel(1.5)),
+        plot.title = element_text(size = rel(1.66)),
         panel.grid.major.x = element_blank(),
         panel.grid.minor.x = element_blank(),
+        legend.title = element_text(size = rel(1.33)),
         legend.position = "bottom") +
+  guides(fill = guide_legend(title.position = "top")) +
     
   ylab("Number of Water Supplier Agencies") +
   xlab("Reported Months") +
-  ggtitle("2014-2016 Reported California Residential Water Usage \nby Number of Water Supplier Agencies") 
+  ggtitle("2014-2016 Reported CA Residential Water Usage \nby Number of Water Supplier Agencies") 
 ```
 
 --- &twocol
 
-**Questions 3 & 4: Have penalties on urban water suppliers affected residential water usage? Since June 2015, have urban water suppliers been meeting their required conservation standards?**
+*** =left width:60%
 
-*** =left width:50%
-```{r, echo=FALSE, fig.width=7, fig.height=3}
+**Have penalties on urban water suppliers affected residential water usage?**
+
+```{r, echo=FALSE, fig.width=6.6, fig.height=5.5}
 
 #Megan's NC plot
 
 NCT$Supplier_Name <- gsub(" City of", "", NCT$Supplier_Name)
 NCT$Supplier_Name <- gsub(" Town of", "", NCT$Supplier_Name)
+NCT$Supplier_Name <- gsub(" District", "", NCT$Supplier_Name)
+NCT$Supplier_Name <- gsub(" Utilities", "", NCT$Supplier_Name)
+NCT$Supplier_Name <- gsub(" Utility", "", NCT$Supplier_Name)
+NCT$Supplier_Name <- gsub(" Public", "", NCT$Supplier_Name)
+NCT$Supplier_Name <- gsub(" Suburban", "", NCT$Supplier_Name)
+NCT$Supplier_Name <- gsub(" Water", "", NCT$Supplier_Name)
+NCT$Supplier_Name <- gsub(" Municipal", "", NCT$Supplier_Name)
+NCT$Supplier_Name <- gsub(" Utility", "", NCT$Supplier_Name)
 
 NCplot <- NCT %>%
-  ggplot(aes(x=Penalties_Assessed, y=ResUse)) + geom_point(aes(color=Supplier_Name, size = 1)) + labs(title= "Northern California", x= "Number of Penalties Assessed", y= "Residential Water Use (Gallons-per-Capita-per-Day)", color = "Water Supplier \nAgency") +  
+  ggplot(aes(x=Penalties_Assessed, y=ResUse)) + geom_point(aes(color=Supplier_Name, size = 1)) + labs(title= "Northern CA Penalities \n& Residential Water Usage", x= "Number of Penalties Assessed", y= "Residential Water Use \n(Gallons-per-Capita-per-Day)", color = "Water Supplier Agency") +  
   theme(panel.background = element_rect(fill = "grey"),
         panel.grid.minor = element_line(linetype = "dotted"), 
     panel.background = element_rect(color = "black"),
-        axis.title.x = element_text(size = rel(1.0)),
-    axis.title.y = element_text(size = rel(.75)),
-        axis.text = element_text(size = rel(.9)),
-        legend.text = element_text(size = rel(1.0)),
-        plot.title = element_text(size = rel(1.5)))
+        axis.title.x = element_text(size = rel(1.75)),
+    axis.title.y = element_text(size = rel(1.75)),
+        axis.text = element_text(size = rel(1.5)),
+        legend.text = element_text(size = rel(1.25)),
+        plot.title = element_text(size = rel(2)),
+        legend.title = element_text(size = rel(1.75)),
+        legend.position="bottom")
 
-NCplot + guides(size=FALSE)
+NCplot + guides(size=FALSE, colour = guide_legend(title.position = "top"))
 ```
 
 
-*** =right width:50%
+*** =right width:40%
 
+**Since June 2015, have urban water suppliers been meeting their required conservation standards?**
 ```{r, echo=FALSE, fig.width=6.5, fig.height=7}
 
 #Megan's last graph
 
 ConP <- CONS %>%
-  ggplot(aes(x=met, y=total, fill=met)) + geom_bar(stat="identity") + facet_wrap( ~ date, labeller = as_labeller(month_named), ncol=3, scales= "free_x") + scale_x_discrete(labels=c("No", "Yes")) + labs(title= "Water Supplier Compliance with Mandatory
+  ggplot(aes(x=met, y=total, fill=met)) + geom_bar(stat="identity") + facet_wrap( ~ date, labeller = as_labeller(month_named), ncol=3, scales= "free_x") + scale_x_discrete(labels=c("No", "Yes")) + labs(title= "Water Supplier Compliance \nwith Mandatory
 Conservation Standards") +   ylab("Number of Water Supplier Agencies") + xlab("Compliance Met?") + 
 scale_fill_manual("Compliance", values=c("firebrick4","dodgerblue4")) +
 geom_text(aes(label=total), vjust=-.01, color='black', size=5) +  ylim(0,400) +
@@ -689,10 +703,10 @@ theme(panel.background =  element_rect(fill = "grey"),
     panel.background = element_rect(color = "black"),  
     panel.grid.minor = element_line(linetype = "dotted"),
     strip.text.x = element_text(size=14),
-    axis.title = element_text(size = rel(1.5)),
-    axis.text = element_text(size = rel(.9)),
-    legend.text = element_text(size = rel(1.0)),
-    plot.title = element_text(size = rel(1.5)),
+    axis.title = element_text(size = rel(1.75)),
+    axis.text = element_text(size = rel(1.25)),
+    legend.text = element_text(size = rel(1.5)),
+    plot.title = element_text(size = rel(2)),
     legend.position="none",
     panel.grid.major.x = element_blank(),
     panel.grid.minor.x = element_blank()
