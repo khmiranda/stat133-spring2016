@@ -264,7 +264,7 @@ drought_severity <- data.frame(drought_severity)
 
 #adding month and year column for later
 drought_severity$releaseDate <- as.Date(drought_severity$releaseDate)
-drought_severity$month <- months(drought_severity$releaseDate, abbr = TRUE)
+drought_severity$month <- month(ymd(drought_severity$releaseDate) + months(0:11), label = TRUE, abbr = TRUE)
 drought_severity$year <- year(ymd(drought_severity$releaseDate)) 
 
 #narrow version of drought_severity 
@@ -295,8 +295,6 @@ CAcountiesvalues <- CAcounties%>%
 #creating levels for mapping later
 CAcountiesvalues$category <- factor(CAcountiesvalues$category, levels = c("D4", "D3", "D2", "D1", "D0", "NONE"))
 
-CAcountiesvalues$month <- factor(CAcountiesvalues$month, levels = c("January", "February", "March", "April", "May","June", "July", "August","September", "October", "November","December"))
-
 #okay so this makes the really large grid with many maps, may just use this as an overview, then take pieces from it?
 
 CAcountiesvalues%>% 
@@ -314,7 +312,7 @@ timelapse <- timelapse  %>%
 bins <- timelapse %>% mutate(D0=D0-D1, D1=D1-D2, D2=D2-D3, D3=D3-D4)
 
 bins$releaseDate <- as.Date(bins$releaseDate)
-bins$month <- months(bins$releaseDate)
+bins$month <- month(ymd(bins$releaseDate)+ months(0:11), label = TRUE, abbr = TRUE)
 bins$year <- year(ymd(bins$releaseDate)) 
 
 bins <- bins %>% mutate( FIPS_avg = (1*D0 + 2*D1 + 3*D2 + 4*D3 + 5*D4) /100 - 1) %>% group_by(month, year, FIPS, county) %>% summarise(monthly_avg = round(mean(FIPS_avg)))
@@ -347,7 +345,6 @@ bins <- bins %>% mutate(monthly_avg=sapply(monthly_avg,drought_levels))
 binscounties <- bins%>%
   right_join(CAcounties, by = c("subregion"))
 
-binscounties$month <- factor(binscounties$month, levels = c("January", "February", "March", "April", "May","June", "July", "August","September", "October", "November","December"))
 
 binscounties$monthly_avg <- factor(binscounties$monthly_avg, levels = c("No Drought (NONE)", "Abnormally Dry (D0)", "Moderate Drought (D1)", "Severe Drought (D2)", "Extreme Drought (D3)", "Exceptional Drought (D4)"))
 
@@ -356,7 +353,7 @@ binscounties <- binscounties %>%
   arrange(month)%>%
   mutate(completedate = (paste(month, year)))
 
-months <- c("January", "February", "March", "April", "May","June", "July", "August","September", "October", "November","December")
+months <- c("Jan", "Feb", "Mar", "Apr", "May","Jun", "Jul", "Aug","Sep", "Oct", "Nov","Dec")
 
 months <- rep(months, times = 17)
 
@@ -691,6 +688,9 @@ month_water_residential %>%
 
 #Megan's NC plot
 
+NCT$Supplier_Name <- gsub(" City of", "", NCT$Supplier_Name)
+NCT$Supplier_Name <- gsub(" Town of", "", NCT$Supplier_Name)
+
 NCplot <- NCT %>%
   ggplot(aes(x=Penalties_Assessed, y=ResUse)) + geom_point(aes(color=Supplier_Name, size = 1)) + labs(title= "Northern California", x= "Number of Penalties Assessed", y= "Residential Water Use (Gallons-per-Capita-per-Day)", color = "Water Supplier \nAgency") +  
   theme(panel.background = element_rect(fill = "grey"),
@@ -710,6 +710,8 @@ NCplot + guides(size=FALSE)
 
 # Megan's CV plot
 
+CVT$Supplier_Name <- gsub(" City of", "", CVT$Supplier_Name)
+
 CVplot <- CVT %>%
   ggplot(aes(x=Penalties_Assessed, y=ResUse)) + geom_point(aes(color=Supplier_Name, size =1)) + labs(title= "The Central Valley", x= "Number of Penalties Assessed", y= "Residential Water Use (Gallons-per-Capita-per-Day)", color = "Water Supplier \nAgency") +  
  theme(panel.background = element_rect(fill = "grey"),
@@ -728,6 +730,11 @@ CVplot + guides(size=FALSE)
 ```{r, echo=FALSE, fig.width=7, fig.height=3}
 
 #Megan's SC plot
+
+
+SCT$Supplier_Name <- gsub(" City of", "", SCT$Supplier_Name)
+
+
 
 #SCplot <- SCT %>%
   #ggplot(aes(x=Penalties_Assessed, y=ResUse)) + geom_point(aes(color=Supplier_Name, size=1)) + labs(title= "Southern California", x= "Number of Penalties Assessed", y= "Residential Water Use (Gallons-per-Capita-per-Day)", color = "Water Supplier \nAgency") +  theme(panel.background = element_rect(fill = "grey"),
