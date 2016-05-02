@@ -264,7 +264,7 @@ drought_severity <- data.frame(drought_severity)
 
 #adding month and year column for later
 drought_severity$releaseDate <- as.Date(drought_severity$releaseDate)
-drought_severity$month <- month(ymd(drought_severity$releaseDate) + months(0:11), label = TRUE, abbr = TRUE)
+drought_severity$month <- month(ymd(drought_severity$releaseDate) + months(0:11), abbr = TRUE)
 drought_severity$year <- year(ymd(drought_severity$releaseDate)) 
 
 #narrow version of drought_severity 
@@ -574,6 +574,7 @@ $(function() {
 ```{r, fig.width=17.5, fig.height=19.5, echo=FALSE, warning=FALSE}
 binscounties%>%
   filter(year >= 2011)%>%
+  na.omit()%>%
   ggplot() + 
   geom_polygon(aes (x = long, y = lat, group = group, fill = monthly_avg), colour = "white", size = 0.02)+
   facet_wrap(~completedate, ncol = 8, drop = TRUE) +
@@ -718,6 +719,7 @@ NCplot + guides(size=FALSE)
 # Megan's CV plot
 
 CVT$Supplier_Name <- gsub(" City of", "", CVT$Supplier_Name)
+CVT$Supplier_Name <- gsub(",", "", CVT$Supplier_Name)
 
 CVplot <- CVT %>%
   ggplot(aes(x=Penalties_Assessed, y=ResUse)) + geom_point(aes(color=Supplier_Name, size =1)) + labs(title= "The Central Valley", x= "Number of Penalties Assessed", y= "Residential Water Use (Gallons-per-Capita-per-Day)", color = "Water Supplier \nAgency") +  
