@@ -240,7 +240,7 @@ narrowall$boundary <- gsub("bay_use_avg", "All 9 Bay Area Counties", narrowall$b
         axis.text = element_text(size = rel(1.0)),
         legend.text = element_text(size = rel(1.0)),
         plot.title = element_text(size = rel(2))
-        ) +
+        ) + geom_vline(aes(xintercept = as.numeric(ymd("2015-04-01"))), color = "red", size=1.5) +
   scale_colour_manual("Region", values = c("green", "blue","yellow"))
 ```
 
