@@ -40,7 +40,7 @@ knit        : slidify::knit2slides
 
 --- &twocol
 
-## HTMN: The California Drought & Residential Water Usage 
+## HTMN: California Drought & Residential Water Usage 
 
 **Question 1: How have CA drought conditions changed since the drought started in 2011?**
 
@@ -60,10 +60,11 @@ $(function() {
 });
 </script>
 
-*** =left 
+*** =left width:90%
 ![plot of chunk unnamed-chunk-14](assets/fig/unnamed-chunk-14-1.png)
 
-*** =right
+*** =right width:10%
+
 ![plot of chunk unnamed-chunk-15](assets/fig/unnamed-chunk-15-1.png)
 
 --- &twocol 
