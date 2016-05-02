@@ -724,7 +724,7 @@ CVplot <- CVT %>%
 CVplot + guides(size=FALSE)
 
 ```
-
+ 
 ```{r, echo=FALSE, fig.width=7, fig.height=3}
 
 #Megan's SC plot
