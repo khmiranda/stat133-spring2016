@@ -284,7 +284,7 @@ drought_severity <- data.frame(drought_severity)
 
 #adding month and year column for later
 drought_severity$releaseDate <- as.Date(drought_severity$releaseDate)
-drought_severity$month <- months(drought_severity$releaseDate)
+drought_severity$month <- month(ymd(drought_severity$releaseDate) + months(0:11), label = TRUE, abbr = TRUE)
 drought_severity$year <- year(ymd(drought_severity$releaseDate)) 
 
 ```
@@ -319,7 +319,6 @@ CAcountiesvalues <- CAcounties%>%
 #creating levels for mapping later
 CAcountiesvalues$category <- factor(CAcountiesvalues$category, levels = c("D4", "D3", "D2", "D1", "D0", "NONE"))
 
-CAcountiesvalues$month <- factor(CAcountiesvalues$month, levels = c("January", "February", "March", "April", "May","June", "July", "August","September", "October", "November","December"))
 
 ```
 
@@ -358,10 +357,9 @@ data manipulation
 bins <- timelapse %>% mutate(D0=D0-D1, D1=D1-D2, D2=D2-D3, D3=D3-D4)
 
 bins$releaseDate <- as.Date(bins$releaseDate)
-bins$month <- months(bins$releaseDate)
+bins$month <- month(ymd(bins$releaseDate)+ months(0:11), label = TRUE, abbr = TRUE)
 bins$year <- year(ymd(bins$releaseDate)) 
 
-head(bins)
 ```
 
 weighted average
@@ -396,7 +394,7 @@ drought_levels <- function(x) {
 }
 
 bins <- bins %>% mutate(monthly_avg=sapply(monthly_avg,drought_levels))
-head(bins)
+
 
 ```
 
@@ -408,7 +406,6 @@ binscounties <- bins%>%
 ```
 plot manipulation
 ```{r}
-binscounties$month <- factor(binscounties$month, levels = c("January", "February", "March", "April", "May","June", "July", "August","September", "October", "November","December"))
 
 binscounties$monthly_avg <- factor(binscounties$monthly_avg, levels = c("No Drought (NONE)", "Abnormally Dry (D0)", "Moderate Drought (D1)", "Severe Drought (D2)", "Extreme Drought (D3)", "Exceptional Drought (D4)"))
 ```
@@ -428,7 +425,7 @@ head(binscounties)
 create levels for all months/years
 
 ```{r}
-months <- c("January", "February", "March", "April", "May","June", "July", "August","September", "October", "November","December")
+months <- c("Jan", "Feb", "Mar", "Apr", "May","Jun", "Jul", "Aug","Sep", "Oct", "Nov","Dec")
 
 months <- rep(months, times = 17)
 
@@ -442,8 +439,7 @@ monthsyears
 
 binscounties$completedate <- factor(levels = c(monthsyears), binscounties$completedate)
 
-
-binscounties$completedate <- as.factor( binscounties$completedate)
+binscounties$completedate <- factor(binscounties$completedate)
 
 binscounties <- data.frame(binscounties)
 ```

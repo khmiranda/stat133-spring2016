@@ -57,6 +57,11 @@ NCT <- table %>%
   mutate(Year= year(date), Month = month(date)) %>%
   filter (Year == 2015) %>%
   filter (Penalties_Assessed > 0) 
+
+NCT$Supplier_Name <- gsub(" City of", "", NCT$Supplier_Name)
+NCT$Supplier_Name <- gsub(" Town of", "", NCT$Supplier_Name)
+
+
 ```
 
 ```{r}
@@ -98,6 +103,9 @@ CVT <- table %>%
   mutate(Month = month(date)) %>%
   filter (Year == 2015) %>%
   filter (Penalties_Assessed > 0)
+
+CVT$Supplier_Name <- gsub(" City of", "", CVT$Supplier_Name)
+
 
 ```
 
@@ -143,7 +151,11 @@ SCT <- table %>%
   mutate(Year= year(date)) %>%
   mutate(Month = month(date)) %>%
   filter (Year == 2015) %>%
-  filter (Penalties_Assessed > 0) 
+  filter (Penalties_Assessed > 0)
+
+
+SCT$Supplier_Name <- gsub(" City of", "", SCT$Supplier_Name)
+
 ```
 
 ```{r}
