@@ -83,7 +83,7 @@ head(bins)
 ```
 
 ```{r}
-bins %>% ggplot(aes(x=Month, fill=monthly_avg)) + geom_bar() + 
+bins %>% ggplot(aes(x=as.Date(Month), fill=monthly_avg)) + geom_bar() + 
  scale_fill_manual("Drought Severity", values=c("#7baad8", "#fffc67", "orange", "darkorange3", "orangered3", "firebrick4")) + facet_wrap(~ monthly_avg) + ggtitle("Number of Counties in Each Drought Level") + ylab("Number of Counties") + theme(axis.text.x = element_text(angle = 45, hjust = 1)) + theme(panel.background = element_rect(fill = "grey"),
         panel.background = element_rect(color = "black"),
         panel.grid.minor = element_line(linetype = "dotted"), 
@@ -93,5 +93,6 @@ bins %>% ggplot(aes(x=Month, fill=monthly_avg)) + geom_bar() +
         plot.title = element_text(size = rel(2)),
         panel.grid.major.x = element_blank(),
         panel.grid.minor.x = element_blank()) +
+        scale_x_date(labels = date_format("%m/%Y")) +
   guides(fill=F)
 ```

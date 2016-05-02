@@ -1,5 +1,5 @@
 ---
-title       : HTMN
+title       :
 subtitle    : 
 author      : 
 job         : 
@@ -38,25 +38,20 @@ knit        : slidify::knit2slides
 
 
 
---- &twocol
+---
 
 ## HTMN: California Drought & Residential Water Usage 
 
 **Question 1: How have CA drought conditions changed since the drought started in 2011?**
 
-*** =left width:90%
 ![plot of chunk unnamed-chunk-14](assets/fig/unnamed-chunk-14-1.png)
-
-*** =right width:10%
-
-![plot of chunk unnamed-chunk-15](assets/fig/unnamed-chunk-15-1.png)
 
 --- &twocol 
 
 **Question 2: How has residential water usage changed since the enactment of the statewide mandatory reductions in April 2015?**
 
 *** =left width:70%
-![plot of chunk unnamed-chunk-16](assets/fig/unnamed-chunk-16-1.png)
+![plot of chunk unnamed-chunk-15](assets/fig/unnamed-chunk-15-1.png)
 
 
 <table style="text-align:center"><tr><td colspan="2" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left"></td><td><em>Dependent variable:</em></td></tr>
@@ -74,20 +69,16 @@ knit        : slidify::knit2slides
 
 ***=right width:30%
 
-![plot of chunk unnamed-chunk-18](assets/fig/unnamed-chunk-18-1.png)
+![plot of chunk unnamed-chunk-17](assets/fig/unnamed-chunk-17-1.png)
 
 --- &twocol
 
 **Questions 3 & 4: Have penalties on urban water suppliers affected residential water usage? Since June 2015, have urban water suppliers been meeting their required conservation standards?**
 
 *** =left width:50%
-![plot of chunk unnamed-chunk-19](assets/fig/unnamed-chunk-19-1.png)
-
-
-![plot of chunk unnamed-chunk-20](assets/fig/unnamed-chunk-20-1.png)
- 
+![plot of chunk unnamed-chunk-18](assets/fig/unnamed-chunk-18-1.png)
 
 
 *** =right width:50%
 
-![plot of chunk unnamed-chunk-22](assets/fig/unnamed-chunk-22-1.png)
+![plot of chunk unnamed-chunk-19](assets/fig/unnamed-chunk-19-1.png)
