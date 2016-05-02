@@ -1,5 +1,5 @@
 ---
-title       : HTMN Final Project Presentation
+title       : HTMN
 subtitle    : 
 author      : 
 job         : 
@@ -29,7 +29,6 @@ library(ggrepel)
 library(stargazer)
 library(lfe)
 ```
-
 
 ```{r include=FALSE}
 
@@ -244,8 +243,6 @@ narrowall$boundary <- gsub("bay_use_avg", "All 9 Bay Area Counties", narrowall$b
   scale_colour_manual("Region", values = c("green", "blue","yellow"))
 ```
 
-
-
 ```{r, include=FALSE}
 #Hope's Map
 
@@ -379,8 +376,6 @@ binscounties$completedate <- as.factor( binscounties$completedate)
 binscounties <- data.frame(binscounties)
 ```
 
-
-
 ```{r, include=FALSE}
 #Tiffany's Graph
 
@@ -459,7 +454,6 @@ month_water_residential <- water_residential  %>%
   summarise(total = n())
 ```
 
-
 ```{r, include=FALSE}
 #Megan's graph
 
@@ -489,16 +483,6 @@ NCT <- table %>%
   filter (Penalties_Assessed > 0) 
 ```
 
-
-```{r, include=FALSE}
-
-# Megan's Statistical Analyis for Northern California
-
-fixed <- felm(ResUse ~ Penalties_Assessed | Supplier_Name + Month, data=NCT)
-
-cor(NCT$Penalties_Assessed, NCT$ResUse)
-```
-
 ```{r, include=FALSE}
 
 # Megan's graph ( I think thisis for Central Valley?)
@@ -513,15 +497,6 @@ CVT <- table %>%
 
 ```
 
-
-```{r, include=FALSE}
-#Megan's Statistical Analyis for Central Valley
-fixed1 <- felm(ResUse ~ Penalties_Assessed | Supplier_Name + Month, data=CVT)
-
-cor(NCT$Penalties_Assessed, NCT$ResUse)
-```
-
-
 ```{r, include=FALSE}
 # Megan's graph (Southern CA)
 SC<- c("Newport Beach  City of", "Beverly Hills  City of","Castaic Lake Water Agency Santa Clarita Water Division" ,"Montecito Water District", "Ontario  City of", "Triunfo Sanitation District / Oak Park Water Service", "Arroyo Grande  City of", "South Coast Water District")
@@ -532,14 +507,6 @@ SCT <- table %>%
   mutate(Month = month(date)) %>%
   filter (Year == 2015) %>%
   filter (Penalties_Assessed > 0) 
-```
-
-
-```{r, include=FALSE}
-# Megan's analyis for SC
-fixed2 <- felm(ResUse ~ Penalties_Assessed | Supplier_Name + Month, data=SCT)
-
-cor(NCT$Penalties_Assessed, NCT$ResUse)
 ```
 
 ```{r, include=FALSE}
@@ -570,7 +537,6 @@ month_named <- c(
   '2016-02-15'= "February 2016")
 ```
 
-
 ```{r, include=FALSE}
 #Megan's last analysis
 REGC <- table %>%
@@ -585,14 +551,32 @@ linear <- lm(Change~Standard + I_Prod,data = REGC)
 summary(linear)
 ```
 
---- &twocol w1:30% w2:70%
+--- &twocol
 
-## How have CA drought conditions changed since the drought started in 2011?
+## HTMN: The California Drought & Residential Water Usage 
 
-*** =left
-```{r, echo=FALSE, fig.width=5, fig.height=5, warning=FALSE}
+**Question 1: How have CA drought conditions changed since the drought started in 2011?**
+
+<!-- Limit image width and height -->
+<style type="text/css">
+img {     
+  max-height: 560px;     
+  max-width: 964px; 
+}
+</style>
+ 
+<!-- Center image on slide -->
+<script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.7.min.js"></script>
+<script type="text/javascript">
+$(function() {     
+  $("p:has(img)").addClass('centered'); 
+});
+</script>
+
+*** =left 
+```{r, echo=FALSE, fig.width=5.5, fig.height=6, warning=FALSE}
 bins %>% ggplot(aes(x=Month, fill=monthly_avg)) + geom_bar() + 
- scale_fill_manual("Drought Severity", values=c("#7baad8", "#fffc67", "orange", "darkorange3", "orangered3", "firebrick4")) + facet_wrap(~ monthly_avg) + ggtitle("No. Counties in Each Severity Level") + ylab("# of Counties") + theme(axis.text.x = element_text(angle = 45, hjust = 1)) + theme(panel.background = element_rect(fill = "grey"),
+ scale_fill_manual("Drought Severity", values=c("#7baad8", "#fffc67", "orange", "darkorange3", "orangered3", "firebrick4")) + facet_wrap(~ monthly_avg) + ggtitle("Number of Counties in \nEach Severity Level") + ylab("Number of Counties") + theme(axis.text.x = element_text(angle = 45, hjust = 1)) + theme(panel.background = element_rect(fill = "grey"),
         panel.background = element_rect(color = "black"),
         panel.grid.minor = element_line(linetype = "dotted"), 
         axis.title = element_text(size = rel(1.5)),
@@ -605,13 +589,13 @@ bins %>% ggplot(aes(x=Month, fill=monthly_avg)) + geom_bar() +
 ```
 
 *** =right
-```{r, fig.width=7.5, fig.height=7.5, echo=FALSE, warning=FALSE}
+```{r, fig.width=9, fig.height=7, echo=FALSE, warning=FALSE}
 binscounties%>%
   filter(year >= 2011)%>%
   ggplot() + 
   geom_polygon(aes (x = long, y = lat, group = group, fill = monthly_avg), colour = "white", size = 0.02)+
   facet_wrap(~completedate, ncol = 8, drop = TRUE) +
-  labs(x = "Month", y = "Year", title = "Drought Severity from 2011--Present") +
+  labs(x = "Month", y = "Year", title = "Drought Severity from 2011-Present") +
   theme(axis.line=element_blank(),
         axis.text=element_blank(),
         axis.ticks=element_blank(),
@@ -630,14 +614,13 @@ binscounties%>%
  scale_fill_manual("Drought Severity", values=c("#7baad8", "#fffc67", "orange", "darkorange3", "orangered3", "firebrick4"))
 
 ```
-*** =fullwidth
 
---- &twocol
+--- &twocol 
 
-## How has residential water usage changed since the enactment of the statewide mandatory reductions in April 2015?
+**Question 2: How has residential water usage changed since the enactment of the statewide mandatory reductions in April 2015?**
 
-*** =left
-```{r, echo=FALSE, fig.width=5, fig.height=3, warning=FALSE}
+*** =left width:70%
+```{r, echo=FALSE, fig.width=7, fig.height=5, warning=FALSE}
 #top left
 water_residential %>% 
   ggplot(aes(x=reporting_month, y= resid_use)) +
@@ -645,24 +628,24 @@ water_residential %>%
   geom_jitter() +
   geom_vline(aes(xintercept = as.numeric(ymd("2015-04-01"))), color = "red", size=1.5) +
   xlab("Reported Months") +
-  ylab("Residential Water Usage (Gallons-per-Capita-per-Day)") +
+  ylab("Residential Water Usage \n(Gallons-per-Capita-per-Day)") +
   ggtitle("2014-2016 Reported California Residential Water Usage") +
   geom_smooth() +
   theme(panel.background = element_rect(fill = "grey"),
         axis.title = element_text(size = rel(1.5)),
         axis.text = element_text(size = rel(1.0)),
         legend.text = element_text(size = rel(1.0)),
-        plot.title = element_text(size = rel(2.5)))
+        plot.title = element_text(size = rel(1.5)))
 ```
 
-```{r, results='asis', warning=FALSE, echo=FALSE}
+```{r, results='asis', warning=FALSE, echo=FALSE, fig.width=4, fig.height=1}
 #top right
-stargazer(fixed, type="html", omit = NULL, dep.var.labels=c("Residential Water Use (R-GPCD)"), out="models.htm")
+stargazer(fixed, type="html", omit = NULL, dep.var.labels=c("Residential Water Usage (R-GPCD)"), out="noosha_models.htm")
 ```
 
-***=right
+***=right width:30%
 
-```{r, echo=FALSE, warning=FALSE}
+```{r, echo=FALSE, warning=FALSE, fig.width=7, fig.height=5}
 
 #bottom left
 
@@ -670,12 +653,12 @@ month_water_residential %>%
   ggplot(aes(x=reporting_month, y = total, group =  overtime_use, fill=overtime_use, color = overtime_use )) +
   geom_bar(stat="identity", position="identity") +
   geom_line(size = 1) +
-  scale_fill_manual(name="Residental Usage\n(Gallons-per-Capita-per-Day)",
+  scale_fill_manual(name="Residental Usage\n(Gallons-per-\nCapita-per-Day)",
                     values=c("#08519C", "#3182BD", "#6BAED6", "#6a51a3", "#ae017e"),
                     breaks=c("0-100", "101-200", "201-300", "301-400", "400+"),
                     labels=c("0-100", "101-200", "201-300","301-400", "400+")) +
   geom_vline(aes(xintercept = as.numeric(ymd("2015-04-01"))), color = "red", size=1.5) +
-  scale_colour_manual(name="Residental Usage\n(Gallons-per-Capita-per-Day)",
+  scale_colour_manual(name="Residental Usage\n(Gallons-per-\nCapita-per-Day)",
                     values=c("#08519C", "#3182BD", "#6BAED6", "#6a51a3", "#ae017e"),
                     breaks=c("0-100", "101-200", "201-300", "301-400", "400+"),
                     labels=c("0-100", "101-200", "201-300","301-400", "400+")) +
@@ -687,79 +670,82 @@ month_water_residential %>%
     box.padding = unit(0.25, "lines"),
     point.padding = unit(0.25, "lines"),
     show.legend=FALSE) + 
-  theme(panel.background = element_rect(fill = "grey"), 
+ theme(panel.background = element_rect(fill = "grey"),
         axis.title = element_text(size = rel(1.5)),
-        axis.text = element_text(size = rel(1.0)),
+        axis.text = element_text(size = rel(.9)),
         legend.text = element_text(size = rel(1.0)),
-        plot.title = element_text(size = rel(2)),
+        plot.title = element_text(size = rel(1.5)),
         panel.grid.major.x = element_blank(),
         panel.grid.minor.x = element_blank()) +
   ylab("Number of Water Supplier Agencies") +
   xlab("Reported Months") +
-  ggtitle("2014-2016 Reported California Residential Water Usage \nby Number of Water Supplier Agencies") 
+  ggtitle("2014-2016 Reported California Residential Water \nUsage by Number of Water Supplier Agencies") 
 ```
 
-*** =fullwidth
+--- &twocol
 
---- &twocol w1:60% w2:40%
+**Questions 3 & 4: Have penalties on urban water suppliers affected residential water usage? Since June 2015, have urban water suppliers been meeting their required conservation standards?**
 
-## Megan title
-Have penalties on urban water suppliers affected residential water usage? Since June 2015, have urban water suppliers been meeting their required conservation standards?
-
-*** =left
-```{r, echo=FALSE, fig.width=5, fig.height=1.5}
+*** =left width:50%
+```{r, echo=FALSE, fig.width=7, fig.height=3}
 
 #Megan's NC plot
 
 NCplot <- NCT %>%
-  ggplot(aes(x=Penalties_Assessed, y=ResUse)) + geom_point(aes(color=Supplier_Name, size = 1)) + labs(title= "Northern California", x= "Number of Penalties Assessed", y= "Residential Water Use (Gallons-per-Capita)", color = "City") +  theme(panel.background = element_rect(fill = "grey"),
+  ggplot(aes(x=Penalties_Assessed, y=ResUse)) + geom_point(aes(color=Supplier_Name, size = 1)) + labs(title= "Northern California", x= "Number of Penalties Assessed", y= "Residential Water Use (Gallons-per-Capita-per-Day)", color = "Water Supplier \nAgency") +  
+  theme(panel.background = element_rect(fill = "grey"),
+        panel.grid.minor = element_line(linetype = "dotted"), 
     panel.background = element_rect(color = "black"),
-    axis.title = element_text(size = rel(1.5)),
-    axis.text = element_text(size = rel(1.0)),
-    legend.text = element_text(size = rel(1.0)),
-    plot.title = element_text(size = rel(2)))
+        axis.title.x = element_text(size = rel(1.0)),
+    axis.title.y = element_text(size = rel(.75)),
+        axis.text = element_text(size = rel(.9)),
+        legend.text = element_text(size = rel(1.0)),
+        plot.title = element_text(size = rel(1.5)))
 
 NCplot + guides(size=FALSE)
 ```
 
 
-```{r, echo=FALSE, fig.width=5, fig.height=1.5}
+```{r, echo=FALSE, fig.width=6, fig.height=3}
 
 # Megan's CV plot
 
 CVplot <- CVT %>%
-  ggplot(aes(x=Penalties_Assessed, y=ResUse)) + geom_point(aes(color=Supplier_Name, size =1)) + labs(title= "The Central Valley", x= "Number of Penalties Assessed", y= "Residential Water Use (Gallons-per-Capita)", color = "City") +  
+  ggplot(aes(x=Penalties_Assessed, y=ResUse)) + geom_point(aes(color=Supplier_Name, size =1)) + labs(title= "The Central Valley", x= "Number of Penalties Assessed", y= "Residential Water Use (Gallons-per-Capita-per-Day)", color = "Water Supplier \nAgency") +  
  theme(panel.background = element_rect(fill = "grey"),
     panel.background = element_rect(color = "black"),
     panel.grid.minor = element_line(linetype = "dotted"), 
-    axis.title = element_text(size = rel(1.5)),
-    axis.text = element_text(size = rel(1.0)),
-    legend.text = element_text(size = rel(1.0)),
-    plot.title = element_text(size = rel(2)))
+    axis.title.x = element_text(size = rel(1.0)),
+    axis.title.y = element_text(size = rel(.75)),
+        axis.text = element_text(size = rel(.9)),
+        legend.text = element_text(size = rel(1.0)),
+        plot.title = element_text(size = rel(1.5)))
 
 CVplot + guides(size=FALSE)
 
 ```
-
-
-```{r, echo=FALSE, fig.width=4, fig.height=1.5}
+ 
+```{r, echo=FALSE, fig.width=7, fig.height=3}
 
 #Megan's SC plot
 
-SCplot <- SCT %>%
-  ggplot(aes(x=Penalties_Assessed, y=ResUse)) + geom_point(aes(color=Supplier_Name, size=1)) + labs(title= "Southern California", x= "Number of Penalties Assessed", y= "Residential Water Use (Gallons-per-Capita)", color = "City") +  theme(panel.background = element_rect(fill = "grey"),
-    panel.background = element_rect(color = "black"),
-    panel.grid.minor = element_line(linetype = "dotted"), 
-    axis.title = element_text(size = rel(1.5)),
-    axis.text = element_text(size = rel(1.0)),
-    legend.text = element_text(size = rel(1.0)),
-    plot.title = element_text(size = rel(2)))
+#SCplot <- SCT %>%
+  #ggplot(aes(x=Penalties_Assessed, y=ResUse)) + geom_point(aes(color=Supplier_Name, size=1)) + labs(title= "Southern California", x= "Number of Penalties Assessed", y= "Residential Water Use (Gallons-per-Capita-per-Day)", color = "Water Supplier \nAgency") +  theme(panel.background = element_rect(fill = "grey"),
+    #panel.background = element_rect(color = "black"),
+    #panel.grid.minor = element_line(linetype = "dotted"), 
+    #axis.title.x = element_text(size = rel(1.0)),
+    #axis.title.y = element_text(size = rel(.75)),
+        #axis.text = element_text(size = rel(.9)),
+        #legend.text = element_text(size = rel(1.0)),
+        #plot.title = element_text(size = rel(1.5)))
 
-SCplot + guides(size=FALSE)
+#SCplot + guides(size=FALSE)
 
 ```
 
-```{r, echo=FALSE, fig.width=2, fig.height=1.5}
+*** =right width:50%
+
+```{r, echo=FALSE, fig.width=6.5, fig.height=7}
 
 #Megan's last graph
 
@@ -772,9 +758,9 @@ theme(panel.background =  element_rect(fill = "grey"),
     panel.background = element_rect(color = "black"),  
     panel.grid.minor = element_line(linetype = "dotted"),   
     axis.title = element_text(size = rel(1.5)),
-    axis.text = element_text(size = rel(1.0)),
+    axis.text = element_text(size = rel(.9)),
     legend.text = element_text(size = rel(1.0)),
-    plot.title = element_text(size = rel(2)),
+    plot.title = element_text(size = rel(1.5)),
     legend.position="none",
     panel.grid.major.x = element_blank(),
     panel.grid.minor.x = element_blank()
@@ -782,41 +768,4 @@ theme(panel.background =  element_rect(fill = "grey"),
 
 ConP 
 
-```
-
-*** =right
-```{r, results = 'asis', echo=FALSE, fig.width=2, fig.height=1.5}
-
-#Megan's NC analysis
-
-stargazer(fixed, type="html",
- dep.var.labels=c("Residential Water Use(R-GPCD)"),
- covariate.labels=c("Penalties Assessed","Residential Water Use (Gallons-per-Capita)"), out="models.htm")
-```
-
-```{r, results = 'asis', echo=FALSE, fig.width=2, fig.height=1.5}
-
-#Megan's CV analysis
-
-stargazer(fixed1, type="html",
- dep.var.labels=c("Residential Water Use(R-GPCD)"),
- covariate.labels=c("Penalties Assessed","Residential Usage"), out="models.htm")
-```
-
-```{r, results = 'asis', echo=FALSE, fig.width=2, fig.height=1.5} 
-
-#Megan's SC analysis
-
-stargazer(fixed2, type="html",
- dep.var.labels=c("Residential Water Use(R-GPCD)"),
- covariate.labels=c("Penalties Assessed","Residential Water Use (Gallons-per-Capita)"), out="models.htm")
-```
-
-```{r, results = 'asis', echo=FALSE, fig.width=2, fig.height=1.5} 
-
-#Megan's last analysis
-
-stargazer(linear, type="html",
- dep.var.labels=c("Percent Conserved"),
- covariate.labels=c("Assigned Percentage","Pre June 2015 Production"), out="models.htm")
 ```

@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>HTMN Final Project Presentation</title>
+  <title>HTMN</title>
   <meta charset="utf-8">
-  <meta name="description" content="HTMN Final Project Presentation">
+  <meta name="description" content="HTMN">
   <meta name="author" content="">
   <meta name="generator" content="slidify" />
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -31,7 +31,7 @@
     <!-- LOGO SLIDE -->
         <slide class="title-slide segue nobackground">
   <hgroup class="auto-fadein">
-    <h1>HTMN Final Project Presentation</h1>
+    <h1>HTMN</h1>
     <h2></h2>
     <p><br/></p>
   </hgroup>
@@ -49,12 +49,62 @@
 
 <slide class="" id="slide-2" style="background:;">
   <hgroup>
-    <h2>How have CA drought conditions changed since the drought started in 2011?</h2>
+    <h2>HTMN: The California Drought &amp; Residential Water Usage</h2>
   </hgroup>
   <article data-timings="">
-    
+    <p><strong>Question 1: How have CA drought conditions changed since the drought started in 2011?</strong></p>
+
+<!-- Limit image width and height -->
+
+<style type="text/css">
+img {     
+  max-height: 560px;     
+  max-width: 964px; 
+}
+</style>
+ 
+
+<!-- Center image on slide -->
+
+<script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.7.min.js"></script>
+
+<script type="text/javascript">
+$(function() {     
+  $("p:has(img)").addClass('centered'); 
+});
+</script>
+
 <div style='float:left;width:48%;' class='centered'>
-  <p><img src="assets/fig/unnamed-chunk-17-1.png" alt="plot of chunk unnamed-chunk-17"></p>
+  <p><img src="assets/fig/unnamed-chunk-14-1.png" alt="plot of chunk unnamed-chunk-14"></p>
+
+</div>
+<div style='float:right;width:48%;'>
+  <p><img src="assets/fig/unnamed-chunk-15-1.png" alt="plot of chunk unnamed-chunk-15"></p>
+
+</div>
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-3" style="background:;">
+  <article data-timings="">
+    <p><strong>Question 2: How has residential water usage changed since the enactment of the statewide mandatory reductions in April 2015?</strong></p>
+
+<div style='float:left;width:48%;' class='centered'>
+  <p><img src="assets/fig/unnamed-chunk-16-1.png" alt="plot of chunk unnamed-chunk-16"></p>
+
+<table style="text-align:center"><tr><td colspan="2" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left"></td><td><em>Dependent variable:</em></td></tr>
+<tr><td></td><td colspan="1" style="border-bottom: 1px solid black"></td></tr>
+<tr><td style="text-align:left"></td><td>Residential Water Usage (R-GPCD)</td></tr>
+<tr><td colspan="2" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left">policy_enacted</td><td>-19.982<sup>***</sup></td></tr>
+<tr><td style="text-align:left"></td><td>(0.475)</td></tr>
+<tr><td style="text-align:left"></td><td></td></tr>
+<tr><td colspan="2" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left">Observations</td><td>17,066</td></tr>
+<tr><td style="text-align:left">R<sup>2</sup></td><td>0.772</td></tr>
+<tr><td style="text-align:left">Adjusted R<sup>2</sup></td><td>0.766</td></tr>
+<tr><td style="text-align:left">Residual Std. Error</td><td>28.689 (df = 16644)</td></tr>
+<tr><td colspan="2" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left"><em>Note:</em></td><td style="text-align:right"><sup>*</sup>p<0.1; <sup>**</sup>p<0.05; <sup>***</sup>p<0.01</td></tr>
+</table>
 
 </div>
 <div style='float:right;width:48%;'>
@@ -65,113 +115,18 @@
   <!-- Presenter Notes -->
 </slide>
 
-<slide class="" id="slide-3" style="background:;">
-  <hgroup>
-    <h2>How has residential water usage changed since the enactment of the statewide mandatory reductions in April 2015?</h2>
-  </hgroup>
+<slide class="" id="slide-4" style="background:;">
   <article data-timings="">
-    
+    <p><strong>Questions 3 &amp; 4: Have penalties on urban water suppliers affected residential water usage? Since June 2015, have urban water suppliers been meeting their required conservation standards?</strong></p>
+
 <div style='float:left;width:48%;' class='centered'>
   <p><img src="assets/fig/unnamed-chunk-19-1.png" alt="plot of chunk unnamed-chunk-19"></p>
 
-<table style="text-align:center"><tr><td colspan="2" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left"></td><td><em>Dependent variable:</em></td></tr>
-<tr><td></td><td colspan="1" style="border-bottom: 1px solid black"></td></tr>
-<tr><td style="text-align:left"></td><td>Residential Water Use (R-GPCD)</td></tr>
-<tr><td colspan="2" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left">Penalties_Assessed</td><td>-0.017<sup>*</sup></td></tr>
-<tr><td style="text-align:left"></td><td>(0.008)</td></tr>
-<tr><td style="text-align:left"></td><td></td></tr>
-<tr><td colspan="2" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left">Observations</td><td>27</td></tr>
-<tr><td style="text-align:left">R<sup>2</sup></td><td>0.945</td></tr>
-<tr><td style="text-align:left">Adjusted R<sup>2</sup></td><td>0.891</td></tr>
-<tr><td style="text-align:left">Residual Std. Error</td><td>14.189 (df = 13)</td></tr>
-<tr><td colspan="2" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left"><em>Note:</em></td><td style="text-align:right"><sup>*</sup>p<0.1; <sup>**</sup>p<0.05; <sup>***</sup>p<0.01</td></tr>
-</table>
+<p><img src="assets/fig/unnamed-chunk-20-1.png" alt="plot of chunk unnamed-chunk-20"></p>
 
 </div>
 <div style='float:right;width:48%;'>
-  <p><img src="assets/fig/unnamed-chunk-21-1.png" alt="plot of chunk unnamed-chunk-21"></p>
-
-</div>
-  </article>
-  <!-- Presenter Notes -->
-</slide>
-
-<slide class="" id="slide-4" style="background:;">
-  <hgroup>
-    <h2>Megan title</h2>
-  </hgroup>
-  <article data-timings="">
-    <p>Have penalties on urban water suppliers affected residential water usage? Since June 2015, have urban water suppliers been meeting their required conservation standards?</p>
-
-<div style='float:left;width:48%;' class='centered'>
   <p><img src="assets/fig/unnamed-chunk-22-1.png" alt="plot of chunk unnamed-chunk-22"></p>
-
-<p><img src="assets/fig/unnamed-chunk-23-1.png" alt="plot of chunk unnamed-chunk-23"></p>
-
-<p><img src="assets/fig/unnamed-chunk-24-1.png" alt="plot of chunk unnamed-chunk-24"></p>
-
-<p><img src="assets/fig/unnamed-chunk-25-1.png" alt="plot of chunk unnamed-chunk-25"></p>
-
-</div>
-<div style='float:right;width:48%;'>
-  <table style="text-align:center"><tr><td colspan="2" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left"></td><td><em>Dependent variable:</em></td></tr>
-<tr><td></td><td colspan="1" style="border-bottom: 1px solid black"></td></tr>
-<tr><td style="text-align:left"></td><td>Residential Water Use(R-GPCD)</td></tr>
-<tr><td colspan="2" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left">Penalties Assessed</td><td>-0.017<sup>*</sup></td></tr>
-<tr><td style="text-align:left"></td><td>(0.008)</td></tr>
-<tr><td style="text-align:left"></td><td></td></tr>
-<tr><td colspan="2" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left">Observations</td><td>27</td></tr>
-<tr><td style="text-align:left">R<sup>2</sup></td><td>0.945</td></tr>
-<tr><td style="text-align:left">Adjusted R<sup>2</sup></td><td>0.891</td></tr>
-<tr><td style="text-align:left">Residual Std. Error</td><td>14.189 (df = 13)</td></tr>
-<tr><td colspan="2" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left"><em>Note:</em></td><td style="text-align:right"><sup>*</sup>p<0.1; <sup>**</sup>p<0.05; <sup>***</sup>p<0.01</td></tr>
-</table>
-
-<table style="text-align:center"><tr><td colspan="2" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left"></td><td><em>Dependent variable:</em></td></tr>
-<tr><td></td><td colspan="1" style="border-bottom: 1px solid black"></td></tr>
-<tr><td style="text-align:left"></td><td>Residential Water Use(R-GPCD)</td></tr>
-<tr><td colspan="2" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left">Penalties Assessed</td><td>0.005<sup>***</sup></td></tr>
-<tr><td style="text-align:left"></td><td>(0.002)</td></tr>
-<tr><td style="text-align:left"></td><td></td></tr>
-<tr><td colspan="2" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left">Observations</td><td>53</td></tr>
-<tr><td style="text-align:left">R<sup>2</sup></td><td>0.934</td></tr>
-<tr><td style="text-align:left">Adjusted R<sup>2</sup></td><td>0.910</td></tr>
-<tr><td style="text-align:left">Residual Std. Error</td><td>11.005 (df = 38)</td></tr>
-<tr><td colspan="2" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left"><em>Note:</em></td><td style="text-align:right"><sup>*</sup>p<0.1; <sup>**</sup>p<0.05; <sup>***</sup>p<0.01</td></tr>
-</table>
-
-<table style="text-align:center"><tr><td colspan="2" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left"></td><td><em>Dependent variable:</em></td></tr>
-<tr><td></td><td colspan="1" style="border-bottom: 1px solid black"></td></tr>
-<tr><td style="text-align:left"></td><td>Residential Water Use(R-GPCD)</td></tr>
-<tr><td colspan="2" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left">Penalties Assessed</td><td>0.009</td></tr>
-<tr><td style="text-align:left"></td><td>(0.019)</td></tr>
-<tr><td style="text-align:left"></td><td></td></tr>
-<tr><td colspan="2" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left">Observations</td><td>38</td></tr>
-<tr><td style="text-align:left">R<sup>2</sup></td><td>0.973</td></tr>
-<tr><td style="text-align:left">Adjusted R<sup>2</sup></td><td>0.957</td></tr>
-<tr><td style="text-align:left">Residual Std. Error</td><td>8.361 (df = 23)</td></tr>
-<tr><td colspan="2" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left"><em>Note:</em></td><td style="text-align:right"><sup>*</sup>p<0.1; <sup>**</sup>p<0.05; <sup>***</sup>p<0.01</td></tr>
-</table>
-
-<table style="text-align:center"><tr><td colspan="2" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left"></td><td><em>Dependent variable:</em></td></tr>
-<tr><td></td><td colspan="1" style="border-bottom: 1px solid black"></td></tr>
-<tr><td style="text-align:left"></td><td>Percent Conserved</td></tr>
-<tr><td colspan="2" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left">Assigned Percentage</td><td>0.343<sup>***</sup></td></tr>
-<tr><td style="text-align:left"></td><td>(0.022)</td></tr>
-<tr><td style="text-align:left"></td><td></td></tr>
-<tr><td style="text-align:left">Pre June 2015 Production</td><td>0.000<sup>***</sup></td></tr>
-<tr><td style="text-align:left"></td><td>(0.000)</td></tr>
-<tr><td style="text-align:left"></td><td></td></tr>
-<tr><td style="text-align:left">Constant</td><td>14.125<sup>***</sup></td></tr>
-<tr><td style="text-align:left"></td><td>(0.585)</td></tr>
-<tr><td style="text-align:left"></td><td></td></tr>
-<tr><td colspan="2" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left">Observations</td><td>3,671</td></tr>
-<tr><td style="text-align:left">R<sup>2</sup></td><td>0.063</td></tr>
-<tr><td style="text-align:left">Adjusted R<sup>2</sup></td><td>0.062</td></tr>
-<tr><td style="text-align:left">Residual Std. Error</td><td>11.441 (df = 3668)</td></tr>
-<tr><td style="text-align:left">F Statistic</td><td>123.152<sup>***</sup> (df = 2; 3668)</td></tr>
-<tr><td colspan="2" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left"><em>Note:</em></td><td style="text-align:right"><sup>*</sup>p<0.1; <sup>**</sup>p<0.05; <sup>***</sup>p<0.01</td></tr>
-</table>
 
 </div>
   </article>
@@ -190,19 +145,19 @@
     </li>
     <li>
       <a href="#" target="_self" rel='tooltip' 
-        data-slide=2 title='How have CA drought conditions changed since the drought started in 2011?'>
+        data-slide=2 title='HTMN: The California Drought &amp; Residential Water Usage'>
          2
       </a>
     </li>
     <li>
       <a href="#" target="_self" rel='tooltip' 
-        data-slide=3 title='How has residential water usage changed since the enactment of the statewide mandatory reductions in April 2015?'>
+        data-slide=3 title='NA'>
          3
       </a>
     </li>
     <li>
       <a href="#" target="_self" rel='tooltip' 
-        data-slide=4 title='Megan title'>
+        data-slide=4 title='NA'>
          4
       </a>
     </li>
