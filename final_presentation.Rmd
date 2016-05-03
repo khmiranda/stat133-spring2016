@@ -615,39 +615,8 @@ stargazer(fixed, type="html", omit = NULL, dep.var.labels=c("Residential Water U
 ```
 
 ***=right width:30%
+![](/Users/jann/Downloads/13153298_10209172929710127_889334363_n.jpg)
 
-```{r, echo=FALSE, warning=FALSE, fig.width=7, fig.height=7}
-month_water_residential %>% 
-  ggplot(aes(x=reporting_month, y = total, group =  overtime_use, fill=overtime_use)) +
-  geom_bar(stat="identity", position="identity") +
-  scale_fill_manual(name="Residental Usage\n(Gallons-per-Capita-per-Day)",
-                    values=c("#08519C", "#3182BD", "#6BAED6", "#6a51a3", "#ae017e"),
-                    breaks=c("0-100", "101-200", "201-300", "301-400", "400+"),
-                    labels=c("0-100", "101-200", "201-300","301-400", "400+")) +
-  geom_vline(aes(xintercept = as.numeric(ymd("2015-04-01"))), color = "red", size=1.5) +
-  geom_label_repel(
-    data = subset(month_water_residential, reporting_month %in% ymd(c("2014-06-15", "2015-04-15","2016-02-15"))),
-    aes(label = total),
-    size = 6, color = "white",
-    fontface = 'bold',
-    box.padding = unit(0.25, "lines"),
-    point.padding = unit(0.25, "lines"),
-    show.legend=FALSE) + 
-  theme(panel.background = element_rect(fill = "grey"), 
-        axis.title = element_text(size = rel(1.33)),
-        axis.text = element_text(size = rel(1.0)),
-        legend.text = element_text(size = rel(1.0)),
-        plot.title = element_text(size = rel(1.66)),
-        panel.grid.major.x = element_blank(),
-        panel.grid.minor.x = element_blank(),
-        legend.title = element_text(size = rel(1.33)),
-        legend.position = "bottom") +
-  guides(fill = guide_legend(title.position = "top")) +
-    
-  ylab("Number of Water Supplier Agencies") +
-  xlab("Reported Months") +
-  ggtitle("2014-2016 Reported CA Residential Water Usage \nby Number of Water Supplier Agencies") 
-```
 
 --- &twocol
 

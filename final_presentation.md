@@ -68,8 +68,8 @@ knit        : slidify::knit2slides
 </table>
 
 ***=right width:30%
+![](/Users/jann/Downloads/13153298_10209172929710127_889334363_n.jpg)
 
-![plot of chunk unnamed-chunk-17](assets/fig/unnamed-chunk-17-1.png)
 
 --- &twocol
 
@@ -77,10 +77,10 @@ knit        : slidify::knit2slides
 
 **Have penalties on urban water suppliers affected residential water usage?**
 
-![plot of chunk unnamed-chunk-18](assets/fig/unnamed-chunk-18-1.png)
+![plot of chunk unnamed-chunk-17](assets/fig/unnamed-chunk-17-1.png)
 
 
 *** =right width:40%
 
 **Since June 2015, have urban water suppliers been meeting their required conservation standards?**
-![plot of chunk unnamed-chunk-19](assets/fig/unnamed-chunk-19-1.png)
+![plot of chunk unnamed-chunk-18](assets/fig/unnamed-chunk-18-1.png)
