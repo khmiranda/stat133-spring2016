@@ -1,6 +1,6 @@
 ---
-title       : HTMN Final Project Presentation
-subtitle    : 
+title       : HTMN
+subtitle    : Kirstian Hope Miranda, Tiffany Jann, Megan Lin, Noosha Razavian
 author      : 
 job         : 
 framework   : io2012        # {io2012, html5slides, shower, dzslides, ...}
@@ -23,11 +23,12 @@ library(scales)
 library(car)
 library(dplyr)
 
-library(printr)
+#library(printr)
 library(rvest)
 library(ggrepel)
 library(stargazer)
 library(lfe)
+
 ```
 
 
@@ -240,11 +241,9 @@ narrowall$boundary <- gsub("bay_use_avg", "All 9 Bay Area Counties", narrowall$b
         axis.text = element_text(size = rel(1.0)),
         legend.text = element_text(size = rel(1.0)),
         plot.title = element_text(size = rel(2))
-        ) +
+        ) + geom_vline(aes(xintercept = as.numeric(ymd("2015-04-01"))), color = "red", size=1.5) +
   scale_colour_manual("Region", values = c("green", "blue","yellow"))
 ```
-
-
 
 ```{r, include=FALSE}
 #Hope's Map
@@ -267,7 +266,7 @@ drought_severity <- data.frame(drought_severity)
 
 #adding month and year column for later
 drought_severity$releaseDate <- as.Date(drought_severity$releaseDate)
-drought_severity$month <- months(drought_severity$releaseDate)
+drought_severity$month <- month(ymd(drought_severity$releaseDate) + months(0:11), abbr = TRUE)
 drought_severity$year <- year(ymd(drought_severity$releaseDate)) 
 
 #narrow version of drought_severity 
@@ -298,8 +297,6 @@ CAcountiesvalues <- CAcounties%>%
 #creating levels for mapping later
 CAcountiesvalues$category <- factor(CAcountiesvalues$category, levels = c("D4", "D3", "D2", "D1", "D0", "NONE"))
 
-CAcountiesvalues$month <- factor(CAcountiesvalues$month, levels = c("January", "February", "March", "April", "May","June", "July", "August","September", "October", "November","December"))
-
 #okay so this makes the really large grid with many maps, may just use this as an overview, then take pieces from it?
 
 CAcountiesvalues%>% 
@@ -317,7 +314,7 @@ timelapse <- timelapse  %>%
 bins <- timelapse %>% mutate(D0=D0-D1, D1=D1-D2, D2=D2-D3, D3=D3-D4)
 
 bins$releaseDate <- as.Date(bins$releaseDate)
-bins$month <- months(bins$releaseDate)
+bins$month <- month(ymd(bins$releaseDate)+ months(0:11), label = TRUE, abbr = TRUE)
 bins$year <- year(ymd(bins$releaseDate)) 
 
 bins <- bins %>% mutate( FIPS_avg = (1*D0 + 2*D1 + 3*D2 + 4*D3 + 5*D4) /100 - 1) %>% group_by(month, year, FIPS, county) %>% summarise(monthly_avg = round(mean(FIPS_avg)))
@@ -350,7 +347,6 @@ bins <- bins %>% mutate(monthly_avg=sapply(monthly_avg,drought_levels))
 binscounties <- bins%>%
   right_join(CAcounties, by = c("subregion"))
 
-binscounties$month <- factor(binscounties$month, levels = c("January", "February", "March", "April", "May","June", "July", "August","September", "October", "November","December"))
 
 binscounties$monthly_avg <- factor(binscounties$monthly_avg, levels = c("No Drought (NONE)", "Abnormally Dry (D0)", "Moderate Drought (D1)", "Severe Drought (D2)", "Extreme Drought (D3)", "Exceptional Drought (D4)"))
 
@@ -359,7 +355,7 @@ binscounties <- binscounties %>%
   arrange(month)%>%
   mutate(completedate = (paste(month, year)))
 
-months <- c("January", "February", "March", "April", "May","June", "July", "August","September", "October", "November","December")
+months <- c("Jan", "Feb", "Mar", "Apr", "May","Jun", "Jul", "Aug","Sep", "Oct", "Nov","Dec")
 
 months <- rep(months, times = 17)
 
@@ -378,8 +374,6 @@ binscounties$completedate <- as.factor( binscounties$completedate)
 
 binscounties <- data.frame(binscounties)
 ```
-
-
 
 ```{r, include=FALSE}
 #Tiffany's Graph
@@ -443,12 +437,12 @@ water_residential$state_mandatory_restrictions <- factor(water_residential$state
 names(water_residential)[names(water_residential) == 'CALCULATED.R.GPCD.Reporting.Month..Values.calculated.by.Water.Board.staff.using.methodology.available.at.http...www.waterboards.ca.gov.waterrights.water_issues.programs.drought.docs.ws_tools.guidance_estimate_res_gpcd.pdf.'] <- 'resid_use'
 ```
 
-```{r, echo = FALSE}
+```{r, include=FALSE}
 #Noosha's analysis regression 1
 fixed <- felm(resid_use ~ policy_enacted | Supplier.Name + month_dummies, data=water_residential)
 ```
 
-```{r, echo = FALSE}
+```{r, include=FALSE}
 #Noosha's analysis regression 2
 month_water_residential <- water_residential  %>%
   mutate(overtime_use = ifelse(resid_use <= 100.00, "0-100",
@@ -459,34 +453,117 @@ month_water_residential <- water_residential  %>%
   summarise(total = n())
 ```
 
---- &twocol
+```{r, include=FALSE}
+#Megan's graph
 
-## CA Drought Data
+usage <- "usagedataset.csv"
+table <- usage %>%
+  read.file() %>%
+  select(Supplier_Name,ResUse, Penalties_Assessed, Reporting_Month, Percent_ResUse, Mandatory_Restrictions,ReportedProd, Prod13, CS) %>%
+  filter( CS != "NULL") %>%
+  mutate(date = lubridate::mdy(Reporting_Month),
+         
+ norcal = ifelse(Supplier_Name %in% c("Pleasanton  City of","Santa Cruz  City of","East Bay Municipal Utilities District", "Yuba City  City of", "Hillsborough  Town of", "Sacramento Suburban Water District", "Olivehurst Public Utility District", "Alco Water Service"), 1,0), 
 
-*** =left
-```{r, echo=FALSE, fig.width=4, fig.height=7, warning=FALSE}
-bins %>% ggplot(aes(x=Month, fill=monthly_avg)) + geom_bar() + 
- scale_fill_manual("Drought Severity", values=c("#7baad8", "#fffc67", "orange", "darkorange3", "orangered3", "firebrick4")) + facet_wrap(~ monthly_avg) + ggtitle("Number of Counties in Each Drought Level") + ylab("# of Counties") + theme(axis.text.x = element_text(angle = 45, hjust = 1)) + theme(panel.background = element_rect(fill = "grey"),
-        panel.background = element_rect(color = "black"),
-        panel.grid.minor = element_line(linetype = "dotted"), 
-        axis.title = element_text(size = rel(1.5)),
-        axis.text = element_text(size = rel(1.0)),
-        legend.text = element_text(size = rel(1.0)),
-        plot.title = element_text(size = rel(2)),
-        panel.grid.major.x = element_blank(),
-        panel.grid.minor.x = element_blank()) +
-  guides(fill=F)
+socal= ifelse(Supplier_Name %in% c("Newport Beach  City of", "Beverly Hills  City of", "Castaic Lake Water Agency Santa Clarita Water Division", "Montecito Water District", "Ontario  City of", "Triunfo Sanitation District / Oak Park Water Service",  "Arroyo Grande  City of" , "South Coast Water District"), 1,0),     
+cv = ifelse(Supplier_Name %in% c("Clovis  City of",  "Fresno  City of" ,  "Ceres  City of", "Hanford  City of",  "Tulare, City of", "Turlock  City of ", "Los Banos, City of", "Exeter  City of"), 1, 0),
+Month = month(date))
+
+table <- table %>%
+  mutate(I_Prod = as.numeric(gsub(",", "", table$Prod13)),F_Prod = as.numeric(gsub(",", "", table$ReportedProd)),   
+Standard = as.numeric(gsub("%", "", table$CS)))
+
+NC <- c("Pleasanton  City of", "Santa Cruz  City of", "East Bay Municipal Utilities District","Yuba City  City of", "Hillsborough  Town of", "Sacramento Suburban Water District", "Olivehurst Public Utility District", "Alco Water Service")
+
+NCT <- table %>%
+  filter(Supplier_Name %in% NC) %>%
+  mutate(Year= year(date), Month = month(date)) %>%
+  filter (Year == 2015) %>%
+  filter (Penalties_Assessed > 0) 
 ```
 
+```{r, include=FALSE}
 
-*** =right
-```{r, fig.width=5, fig.height=8, echo=FALSE, warning=FALSE}
+# Megan's graph ( I think thisis for Central Valley?)
+CV <- c("Clovis  City of", "Fresno  City of", "Ceres  City of", "Hanford  City of", "Tulare, City of", "Turlock  City of", "Los Banos, City of", "Exeter  City of")
+
+CVT <- table %>%
+  filter(Supplier_Name %in% CV) %>%
+  mutate(Year= year(date)) %>%
+  mutate(Month = month(date)) %>%
+  filter (Year == 2015) %>%
+  filter (Penalties_Assessed > 0)
+
+```
+
+```{r, include=FALSE}
+# Megan's graph (Southern CA)
+SC<- c("Newport Beach  City of", "Beverly Hills  City of","Castaic Lake Water Agency Santa Clarita Water Division" ,"Montecito Water District", "Ontario  City of", "Triunfo Sanitation District / Oak Park Water Service", "Arroyo Grande  City of", "South Coast Water District")
+
+SCT <- table %>%
+  filter(Supplier_Name %in% SC) %>%
+  mutate(Year= year(date)) %>%
+  mutate(Month = month(date)) %>%
+  filter (Year == 2015) %>%
+  filter (Penalties_Assessed > 0) 
+```
+
+```{r, include=FALSE}
+
+#Megan's last graph
+
+CONS <- table %>%
+  select(Supplier_Name, I_Prod, F_Prod, Standard, date) %>%
+  mutate(Year= year(date)) %>%
+  filter(Year == 2015 | Year == 2016) %>%
+  filter(Standard != "NULL") %>%
+  mutate(Month= month(date)) %>%
+  mutate(Change = ((I_Prod-F_Prod)/(I_Prod)) *100, 
+         pc= ifelse(Change > Standard, 1, 0),
+         met =ifelse(pc == 1, "Met", "Did not Meet")) %>%
+  group_by(met, date) %>%
+  summarise(total = n())
+
+month_named <- c(
+  '2015-06-15'= "June 2015",
+  '2015-07-15'= "July 2015",
+  '2015-08-15'= "August 2015",
+  '2015-09-15'= "September 2015", 
+  '2015-10-15'= "October 2015",
+  '2015-11-15'= "November 2015",
+  '2015-12-15'= "December 2015",
+  '2016-01-15'= "January 2016",
+  '2016-02-15'= "February 2016")
+```
+
+```{r, include=FALSE}
+#Megan's last analysis
+REGC <- table %>%
+  select(Supplier_Name, I_Prod, F_Prod, Standard, date) %>%
+  mutate(Year= year(date)) %>%
+  filter(Year == 2015 | Year == 2016) %>%
+  filter(Standard != "NULL") %>%
+  mutate(Month= month(date)) %>%
+  mutate(Change = ((I_Prod-F_Prod)/(I_Prod)) *100)
+
+linear <- lm(Change~Standard + I_Prod,data = REGC) 
+summary(linear)
+```
+
+---
+
+
+**How have CA drought conditions changed since the drought started in 2011?**
+
+```{r, fig.width=13.5, fig.height=7, echo=FALSE, warning=FALSE}
 binscounties%>%
   filter(year >= 2011)%>%
+  na.omit()%>%
   ggplot() + 
   geom_polygon(aes (x = long, y = lat, group = group, fill = monthly_avg), colour = "white", size = 0.02)+
-  facet_wrap(~completedate, ncol = 12, drop = TRUE) +
-  labs(x = "Month", y = "Year", title = "Drought Severity in California from 2011 to Present") +
+  facet_wrap(~completedate, ncol = 13, drop = TRUE) +
+  ggtitle("Drought Severity: 2011-Present") +
+  #xlab("Month") + ylab("Year") +
   theme(axis.line=element_blank(),
         axis.text=element_blank(),
         axis.ticks=element_blank(),
@@ -497,23 +574,26 @@ binscounties%>%
         panel.background = element_rect(fill = "grey"),
         panel.background = element_rect(color = "black"),
         panel.grid.minor = element_line(linetype = "dotted"), 
-        axis.title = element_text(size = rel(1.5)),
-        legend.text = element_text(size = rel(1.0)),
-        plot.title = element_text(size = rel(2))
+        #axis.title = element_text(size = rel(1.5)),
+        axis.title = element_blank(),
+        legend.key.size = unit(.5, "cm"),
+        strip.text.x = element_text(size=11),
+        legend.text = element_text(size = rel(1)),
+        plot.title = element_text(size = rel(2.25)),
+        legend.title = element_text(size = rel(1.5))
         ) + 
   theme(axis.line=element_blank(),axis.text.x=element_blank(),axis.text.y=element_blank(),axis.ticks=element_blank()) + 
  scale_fill_manual("Drought Severity", values=c("#7baad8", "#fffc67", "orange", "darkorange3", "orangered3", "firebrick4"))
 
 ```
-*** =fullwidth
----
 
 --- &twocol
 
-## Second slide
+**How has residential water usage changed since the enactment of the statewide mandatory
+reductions in April 2015?**
 
-*** =left
-```{r, echo=FALSE, fig.width=5, fig.height=3, warning=FALSE}
+*** =left width:70%
+```{r, echo=FALSE, fig.width=7, fig.height=5, warning=FALSE}
 #top left
 water_residential %>% 
   ggplot(aes(x=reporting_month, y= resid_use)) +
@@ -521,58 +601,88 @@ water_residential %>%
   geom_jitter() +
   geom_vline(aes(xintercept = as.numeric(ymd("2015-04-01"))), color = "red", size=1.5) +
   xlab("Reported Months") +
-  ylab("Residential Water Usage (Gallons-per-Capita-per-Day)") +
-  ggtitle("2014-2016 Reported California Residential Water Usage") +
+  ylab("Residential Water Usage \n(Gallons-per-Capita-per-Day)") +
+  ggtitle("2014-2016 Reported CA Residential Water Usage") +
   geom_smooth() +
   theme(panel.background = element_rect(fill = "grey"),
-        axis.title = element_text(size = rel(1.5)),
+        axis.title = element_text(size = rel(1.33)),
         axis.text = element_text(size = rel(1.0)),
         legend.text = element_text(size = rel(1.0)),
-        plot.title = element_text(size = rel(2.5)))
+        plot.title = element_text(size = rel(1.66)))
 ```
 
-```{r, results='asis', warning=FALSE, echo=FALSE}
+```{r, results='asis', warning=FALSE, echo=FALSE, fig.width=4, fig.height=1}
 #top right
-stargazer(fixed, type="html", omit = NULL, dep.var.labels=c("Residential Water Use (R-GPCD)"), out="models.htm")
+stargazer(fixed, type="html", omit = NULL, dep.var.labels=c("Residential Water Usage (R-GPCD)"), out="noosha_models.htm")
 ```
 
-***=right
+***=right width:30%
+![](nooshaslideright.jpg)
 
-```{r, echo=FALSE, warning=FALSE}
-#bottom left
-month_water_residential %>% 
-  ggplot(aes(x=reporting_month, y = total, group =  overtime_use, fill=overtime_use, color = overtime_use )) +
-  geom_bar(stat="identity", position="identity") +
-  geom_line(size = 1) +
-  scale_fill_manual(name="Residental Usage\n(Gallons-per-Capita-per-Day)",
-                    values=c("#08519C", "#3182BD", "#6BAED6", "#6a51a3", "#ae017e"),
-                    breaks=c("0-100", "101-200", "201-300", "301-400", "400+"),
-                    labels=c("0-100", "101-200", "201-300","301-400", "400+")) +
-  geom_vline(aes(xintercept = as.numeric(ymd("2015-04-01"))), color = "red", size=1.5) +
-  scale_colour_manual(name="Residental Usage\n(Gallons-per-Capita-per-Day)",
-                    values=c("#08519C", "#3182BD", "#6BAED6", "#6a51a3", "#ae017e"),
-                    breaks=c("0-100", "101-200", "201-300", "301-400", "400+"),
-                    labels=c("0-100", "101-200", "201-300","301-400", "400+")) +
-  geom_label_repel(
-    data = subset(month_water_residential, reporting_month %in% ymd(c("2014-06-15", "2015-04-15","2016-02-15"))),
-    aes(label = total),
-    size = 6, color = "white",
-    fontface = 'bold',
-    box.padding = unit(0.25, "lines"),
-    point.padding = unit(0.25, "lines"),
-    show.legend=FALSE) + 
-  theme(panel.background = element_rect(fill = "grey"), 
-        axis.title = element_text(size = rel(1.5)),
-        axis.text = element_text(size = rel(1.0)),
-        legend.text = element_text(size = rel(1.0)),
+
+--- &twocol
+
+*** =left width:60%
+
+**Have penalties on urban water suppliers affected residential water usage?**
+
+```{r, echo=FALSE, fig.width=6.6, fig.height=5.5}
+
+#Megan's NC plot
+
+NCT$Supplier_Name <- gsub(" City of", "", NCT$Supplier_Name)
+NCT$Supplier_Name <- gsub(" Town of", "", NCT$Supplier_Name)
+NCT$Supplier_Name <- gsub(" District", "", NCT$Supplier_Name)
+NCT$Supplier_Name <- gsub(" Utilities", "", NCT$Supplier_Name)
+NCT$Supplier_Name <- gsub(" Utility", "", NCT$Supplier_Name)
+NCT$Supplier_Name <- gsub(" Public", "", NCT$Supplier_Name)
+NCT$Supplier_Name <- gsub(" Suburban", "", NCT$Supplier_Name)
+NCT$Supplier_Name <- gsub(" Water", "", NCT$Supplier_Name)
+NCT$Supplier_Name <- gsub(" Municipal", "", NCT$Supplier_Name)
+NCT$Supplier_Name <- gsub(" Utility", "", NCT$Supplier_Name)
+
+NCplot <- NCT %>%
+  ggplot(aes(x=Penalties_Assessed, y=ResUse)) + geom_point(aes(color=Supplier_Name, size = 1)) + labs(title= "Northern CA Penalities \n& Residential Water Usage", x= "Number of Penalties Assessed", y= "Residential Water Use \n(Gallons-per-Capita-per-Day)", color = "Water Supplier Agency") +  
+  theme(panel.background = element_rect(fill = "grey"),
+        panel.grid.minor = element_line(linetype = "dotted"), 
+    panel.background = element_rect(color = "black"),
+        axis.title.x = element_text(size = rel(1.75)),
+    axis.title.y = element_text(size = rel(1.75)),
+        axis.text = element_text(size = rel(1.5)),
+        legend.text = element_text(size = rel(1.25)),
         plot.title = element_text(size = rel(2)),
-        panel.grid.major.x = element_blank(),
-        panel.grid.minor.x = element_blank()) +
-  ylab("Number of Water Supplier Agencies") +
-  xlab("Reported Months") +
-  ggtitle("2014-2016 Reported California Residential Water Usage \nby Number of Water Supplier Agencies") 
+        legend.title = element_text(size = rel(1.75)),
+        legend.position="bottom")
+
+NCplot + guides(size=FALSE, colour = guide_legend(title.position = "top"))
 ```
 
----
 
+*** =right width:40%
 
+**Since June 2015, have urban water suppliers been meeting their required conservation standards?**
+```{r, echo=FALSE, fig.width=6.5, fig.height=7}
+
+#Megan's last graph
+
+ConP <- CONS %>%
+  ggplot(aes(x=met, y=total, fill=met)) + geom_bar(stat="identity") + facet_wrap( ~ date, labeller = as_labeller(month_named), ncol=3, scales= "free_x") + scale_x_discrete(labels=c("No", "Yes")) + labs(title= "Water Supplier Compliance \nwith Mandatory
+Conservation Standards") +   ylab("Number of Water Supplier Agencies") + xlab("Compliance Met?") + 
+scale_fill_manual("Compliance", values=c("firebrick4","dodgerblue4")) +
+geom_text(aes(label=total), vjust=-.01, color='black', size=5) +  ylim(0,400) +
+theme(panel.background =  element_rect(fill = "grey"),  
+    panel.background = element_rect(color = "black"),  
+    panel.grid.minor = element_line(linetype = "dotted"),
+    strip.text.x = element_text(size=14),
+    axis.title = element_text(size = rel(1.75)),
+    axis.text = element_text(size = rel(1.25)),
+    legend.text = element_text(size = rel(1.5)),
+    plot.title = element_text(size = rel(2)),
+    legend.position="none",
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor.x = element_blank()
+) 
+
+ConP 
+
+```

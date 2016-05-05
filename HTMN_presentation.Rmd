@@ -78,15 +78,6 @@ CAcountiesvalues <- CAcounties%>%
 #creating levels for mapping later
 CAcountiesvalues$category <- factor(CAcountiesvalues$category, levels = c("D4", "D3", "D2", "D1", "D0", "NONE"))
 
-#okay so this makes the really large grid with many maps, may just use this as an overview, then take pieces from it?
-
-CAcountiesvalues%>% 
-  ggplot() + 
-  geom_polygon(aes (x = long, y = lat, group = group, fill = ave_value), colour = "white", size = 0.02)+ scale_fill_gradient(low = "yellow", high = "red") + 
-  facet_grid(category ~ year) +
-  labs(x = "Year", y = "Drought Severity", title = "Drought Severity vs Year") +
-  theme(axis.line=element_blank(),axis.text.x=element_blank(),axis.text.y=element_blank(),axis.ticks=element_blank())
-
 timelapse <- "final_COUNTY2000-2016.csv"
 timelapse <- timelapse  %>%
   read.file() %>%
@@ -193,12 +184,12 @@ binscounties%>%
 ```
 
 ##
-**How have CA drought conditions changed since the drought started in 2011?**
+**How has residential water usage changed since the enactment of the statewide mandatory reductions in April 2015?**
 ```{r, out.width = 1200, echo=F}
-knitr::include_graphics("/Users/jann/Desktop/final_presentationi2.jpg")
+knitr::include_graphics("HTMN_presentationi2.jpg")
 ```
 
 ##
 ```{r, out.width = 1400, echo=F}
-knitr::include_graphics("/Users/jann/Desktop/final_presentationi3.jpg")
+knitr::include_graphics("HTMN_presentationi3.jpg")
 ```

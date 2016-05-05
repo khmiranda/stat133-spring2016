@@ -41,14 +41,15 @@ knit        : slidify::knit2slides
 
 ---
 
-## HTMN: CA Drought & Residential Water Usage
 
 **How have CA drought conditions changed since the drought started in 2011?**
 
 ![plot of chunk unnamed-chunk-14](assets/fig/unnamed-chunk-14-1.png)
 
---- &twocol 
+--- &twocol
 
+**How has residential water usage changed since the enactment of the statewide mandatory
+reductions in April 2015?**
 
 *** =left width:70%
 ![plot of chunk unnamed-chunk-15](assets/fig/unnamed-chunk-15-1.png)
@@ -68,7 +69,7 @@ knit        : slidify::knit2slides
 </table>
 
 ***=right width:30%
-![](/Users/jann/Downloads/13153298_10209172929710127_889334363_n.jpg)
+![](nooshaslideright.jpg)
 
 
 --- &twocol
