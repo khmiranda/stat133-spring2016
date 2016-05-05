@@ -1,6 +1,6 @@
 ---
-title       :
-subtitle    : 
+title       : HTMN
+subtitle    : Kirstian Hope Miranda, Tiffany Jann, Megan Lin, Noosha Razavian
 author      : 
 job         : 
 framework   : io2012        # {io2012, html5slides, shower, dzslides, ...}
@@ -28,7 +28,9 @@ library(rvest)
 library(ggrepel)
 library(stargazer)
 library(lfe)
+
 ```
+
 
 ```{r include=FALSE}
 
@@ -550,7 +552,7 @@ summary(linear)
 
 ---
 
-## HTMN: CA Drought & Residential Water Usage 
+## HTMN: CA Drought & Residential Water Usage
 
 **How have CA drought conditions changed since the drought started in 2011?**
 
@@ -588,7 +590,6 @@ binscounties%>%
 
 --- &twocol 
 
-**How has residential water usage changed since the enactment of the statewide mandatory reductions in April 2015?**
 
 *** =left width:70%
 ```{r, echo=FALSE, fig.width=7, fig.height=5, warning=FALSE}
