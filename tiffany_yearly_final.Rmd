@@ -91,7 +91,7 @@ bins %>% ggplot(aes(x=Year)) + geom_bar(aes(color=Year, fill= yearly_avg)) +
         legend.text = element_text(size = rel(1.0)),
         plot.title = element_text(size = rel(2)),
         panel.grid.major.x = element_blank(),
-        panel.grid.minor.x = element_blank())
+        panel.grid.minor.x = element_blank())+ guides(fill=F)
 ```
 
 ```{r}

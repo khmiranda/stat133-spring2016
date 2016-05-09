@@ -60,6 +60,9 @@ NCT <- table %>%
 
 NCT$Supplier_Name <- gsub(" City of", "", NCT$Supplier_Name)
 NCT$Supplier_Name <- gsub(" Town of", "", NCT$Supplier_Name)
+NCT$Supplier_Name <- gsub(" District", "", NCT$Supplier_Name)
+NCT$Supplier_Name <- gsub(" Public Utility", "", NCT$Supplier_Name)
+NCT$Supplier_Name <- gsub(" Municipal Utilities", "", NCT$Supplier_Name)
 
 
 ```
@@ -71,6 +74,7 @@ NCplot <- NCT %>%
     axis.title = element_text(size = rel(1.5)),
     axis.text = element_text(size = rel(1.0)),
     legend.text = element_text(size = rel(1.0)),
+    legend.position = "bottom",
     plot.title = element_text(size = rel(2)))
 
 NCplot + guides(size=FALSE)
@@ -105,7 +109,7 @@ CVT <- table %>%
   filter (Penalties_Assessed > 0)
 
 CVT$Supplier_Name <- gsub(" City of", "", CVT$Supplier_Name)
-
+CVT$Supplier_Name <- gsub(",", "", CVT$Supplier_Name)
 
 ```
 
@@ -118,6 +122,7 @@ CVplot <- CVT %>%
     axis.title = element_text(size = rel(1.5)),
     axis.text = element_text(size = rel(1.0)),
     legend.text = element_text(size = rel(1.0)),
+    legend.position = "bottom",
     plot.title = element_text(size = rel(2)))
 
 CVplot + guides(size=FALSE)
@@ -155,6 +160,10 @@ SCT <- table %>%
 
 
 SCT$Supplier_Name <- gsub(" City of", "", SCT$Supplier_Name)
+SCT$Supplier_Name <- gsub(" District", "", SCT$Supplier_Name)
+SCT$Supplier_Name <- gsub(" Agency", "", SCT$Supplier_Name)
+SCT$Supplier_Name <- gsub(" Water", "", SCT$Supplier_Name)
+SCT$Supplier_Name <- gsub(" Division", "", SCT$Supplier_Name)
 
 ```
 
@@ -166,6 +175,7 @@ SCplot <- SCT %>%
     axis.title = element_text(size = rel(1.5)),
     axis.text = element_text(size = rel(1.0)),
     legend.text = element_text(size = rel(1.0)),
+    legend.position = "bottom",
     plot.title = element_text(size = rel(2)))
 
 SCplot + guides(size=FALSE)

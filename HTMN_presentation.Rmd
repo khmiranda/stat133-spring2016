@@ -1,9 +1,7 @@
 ---
-title: "HTMN"
-author: "Kirstian Hope Miranda, Tiffany Jann, Megan Lin, Noosha Razavian"
-date: "May 3, 2016"
 output: slidy_presentation
 ---
+
 ```{r, include=FALSE}
 library(DataComputing)
 library(lubridate)
@@ -12,6 +10,7 @@ library(ggthemes)
 library(RColorBrewer)
 library(grid)
 library(scales)
+
 
 library(car)
 library(dplyr)
@@ -24,7 +23,6 @@ library(lfe)
 
 library(knitr)
 ```
-
 
 ```{r, include=FALSE}
 #Hope's Map
@@ -148,8 +146,9 @@ binscounties <- data.frame(binscounties)
 ```
 
 
-##
-**How have CA drought conditions changed since the drought started in 2011?**
+## HTMN: Kirstian Hope Miranda, Tiffany Jann, Megan Lin, Noosha Razavian
+
+How have CA drought conditions changed since the drought started in 2011?
 
 ```{r, fig.width=13, fig.height=6.7, echo=FALSE, warning=FALSE}
 binscounties%>%
@@ -184,7 +183,9 @@ binscounties%>%
 ```
 
 ##
-**How has residential water usage changed since the enactment of the statewide mandatory reductions in April 2015?**
+How has residential water usage changed since the enactment of the statewide mandatory reductions in April 2015?
+&nbsp;
+
 ```{r, out.width = 1200, echo=F}
 knitr::include_graphics("HTMN_presentationi2.jpg")
 ```
