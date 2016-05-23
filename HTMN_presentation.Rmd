@@ -186,7 +186,7 @@ binscounties%>%
 How has residential water usage changed since the enactment of the statewide mandatory reductions in April 2015?
 &nbsp;
 
-```{r, out.width = 1200, echo=F}
+```{r, out.width = 1300, echo=F}
 knitr::include_graphics("HTMN_presentationi2.jpg")
 ```
 
